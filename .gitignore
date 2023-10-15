@@ -1,0 +1,14 @@
+# compile
+cmake_install.cmake
+CMakeFiles
+CMakeCache.txt
+cmake-build
+Makefile
+# IDE
+.idea
+.vscode
+# executable
+*.o
+*.exe
+*.app
+*.lib.a
