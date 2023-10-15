@@ -27,6 +27,7 @@ private:
     int bufferSize_ = 0X200;
     struct sockaddr_in socketAddress_;
     unsigned int socketAddress_len_;
+    bool stop_ = false;
 
     void _listen();
     int _accept();

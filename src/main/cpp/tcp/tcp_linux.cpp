@@ -44,6 +44,7 @@ void TcpListener::start() {
 }
 
 void TcpListener::stop() {
+    stop_ = true;
     close(socket_fd_);
 }
 
@@ -56,8 +57,15 @@ void TcpListener::_listen() {
     
     while (true) {
         int conn_socket_fd = this->_accept();
-        
+
+        if (conn_socket_fd < 0) {
+            Log::warn("socket connection error. _fd: " + std::to_string(conn_socket_fd));
+            close(conn_socket_fd);
+            if (stop_) break;
+            else continue;
+        }
         Log::info("New request received, _fd: " + std::to_string(conn_socket_fd));
+        
 
         ssize_t bytesReceived = 0;
         char buffer[bufferSize_];
@@ -99,8 +107,10 @@ void TcpListener::sendResponse(int& _conn_socket_fd) {
     std::string content = "200 ok 成功";
     http::Headers headers;
 
-    headers.set("Content-Type", "text/plain; charset=utf-8");
-    headers.set("Content-Length", std::to_string(content.size()));
+    // headers.set("Content-Type", "text/plain; charset=utf-8");
+    // headers.set("Content-Length", std::to_string(content.size()));
+    headers["Content-Type"] = "text/plain; charset=utf-8";
+    headers["Content-Length"] = std::to_string(content.size());
     
     std::ostringstream osstream;
     osstream << "HTTP/1.1 200 OK\n" << headers.str() << "\n"
