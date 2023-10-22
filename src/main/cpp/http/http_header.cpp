@@ -16,7 +16,7 @@ void Headers::set(std::string headerName, std::string value) {
     headers_[headerName] = move(value);
 }
 
-std::string Headers::str() {
+std::string Headers::str() const {
     std::ostringstream osstream;
     for (auto& [k, v] : headers_) {
         osstream << k << ": "  << v << "\n";

@@ -12,20 +12,20 @@ namespace http {
 class HttpServer {
 public:
     HttpServer(std::string ipAddress, int port):
-        m_ipAddress(ipAddress),
-        m_port(port),
-        tcp(ipAddress, port) {
-
-    };
+        ipAddress_(ipAddress),
+        port_(port),
+        tcp_(ipAddress, port) {
+            
+    }
 
     ~HttpServer() = default;
     
     int start();
 
 private:
-    std::string m_ipAddress;
-    int m_port;
-    tcp::TcpListener tcp;
+    std::string ipAddress_;
+    int port_;
+    tcp::TcpListener tcp_;
 };
 
 } // http

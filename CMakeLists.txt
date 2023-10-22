@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.22)
 
 project(ElasticJeans)
 
@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 file(GLOB HDRS src/main/cpp/**/*.hpp src/main/cpp/*.hpp)
 file(GLOB SRCS src/main/cpp/**/*.cpp src/main/cpp/*.cpp)
 
-add_library(${LIB} ${HDRS} ${SRCS})
+add_library(${LIB} STATIC ${HDRS} ${SRCS})
 add_executable(${TARGET} src/main/cpp/main.cpp)
 target_link_libraries(${TARGET} ${LIB})
 

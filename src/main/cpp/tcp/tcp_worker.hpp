@@ -1,21 +1,51 @@
 #ifndef _ELASTICJEANS_TCP_WORKER_H
 #define _ELASTICJEANS_TCP_WORKER_H
 
+#include "../util/thread_pool.hpp"
+
+#include <queue>
+#include <memory>
+
 namespace elasticJeans {
+
+using uniqueCbFn = std::unique_ptr<std::function<void(std::string&,  std::string&)>>;
+
 namespace tcp {
 
-class Worker {
-
-};
-
-class WorkerPool {
-
+class Workers {
 public:
-    WorkerPool(int poolSize = 32);
+    explicit Workers(size_t poolSize = 32) :
+        poolSize_(poolSize) {
+        threadPool_ = std::make_unique<ThreadPool>(poolSize);
+    }
+
+    template<typename F>
+    int registerCbFunc(F&& f);
+
+    void handle(int conn_socket_fd);
+
+    void sendResponse(int conn_socket_fd, const std::string& response);
 
 private:
-    int poolSize_;
+    std::unique_ptr<ThreadPool> threadPool_;
+    size_t poolSize_;
+    int bufferSize_ = 0X200;
+    std::vector<uniqueCbFn> fnChain;
+
+    void doHandle(int conn_socket_fd);
+
 };
+
+template<typename F>
+int Workers::registerCbFunc(F&& f) {
+
+    fnChain.push_back(
+        std::make_unique<std::function<void(std::string&,  std::string&)>>(
+            std::forward<F>(f)
+    ));
+
+    return fnChain.size();
+}
 
 } // namespace tcp
 } // namespace elasticJeans
