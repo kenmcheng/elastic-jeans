@@ -9,7 +9,6 @@
 
 namespace elasticJeans {
 
-using cbFuncType = std::function<void(std::string&,  std::string&)>;
 namespace tcp {
 
 class TcpListener {

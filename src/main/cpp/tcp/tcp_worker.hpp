@@ -8,7 +8,8 @@
 
 namespace elasticJeans {
 
-using uniqueCbFn = std::unique_ptr<std::function<void(std::string&,  std::string&)>>;
+using cbFn = std::function<int(std::string&,  std::string&)>;
+using uniqueCbFn = std::unique_ptr<cbFn>;
 
 namespace tcp {
 
@@ -40,9 +41,7 @@ template<typename F>
 int Workers::registerCbFunc(F&& f) {
 
     fnChain.push_back(
-        std::make_unique<std::function<void(std::string&,  std::string&)>>(
-            std::forward<F>(f)
-    ));
+        std::make_unique<cbFn>(std::forward<F>(f)));
 
     return fnChain.size();
 }

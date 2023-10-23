@@ -12,7 +12,7 @@ namespace http {
 
 int HttpServer::start() {
     Log::info(ipAddress_ + ":" + std::to_string(port_) );
-    tcp_.registerCbFunc([](std::string& req, std::string& resp) -> void {
+    tcp_.registerCbFunc([](std::string& req, std::string& resp) -> int {
         std::string content =  "200 ok 成功!!!";
 
         http::Headers headers;
@@ -24,6 +24,7 @@ int HttpServer::start() {
         osstream << "HTTP/1.1 200 OK\n" << headers.str() << "\n"
             << content;
         resp = osstream.str();
+        return 0;
     });
 
     tcp_.start();
