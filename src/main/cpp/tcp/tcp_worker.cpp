@@ -18,7 +18,7 @@ void Workers::handle(int conn_socket_fd) {
     auto fn = [this] (int conn_socket_fd) -> void {
         doHandle(conn_socket_fd);
     };
-    threadPool_->add(std::move(fn), conn_socket_fd);
+    threadPoolExecutor_->submit(std::move(fn), conn_socket_fd);
 }
 
 void Workers::doHandle(int conn_socket_fd) {
@@ -63,7 +63,7 @@ void Workers::doHandle(int conn_socket_fd) {
             fin = true;
         }
     } catch (std::exception e) {
-        Log::error("failed to handle reuqest");
+        Log::error("Failed to handle reuqest");
         fin = true;
     }
 
@@ -77,9 +77,9 @@ void Workers::sendResponse(int conn_socket_fd, const std::string& response) {
     bytesSent = write(conn_socket_fd, response.c_str(), response.size());
 
     if (bytesSent == response.size()) {
-        Log::info("------ Server Response sent to client ------");
+        Log::info("------ Server response has been sent ------");
     } else {
-        Log::info("Error sending response to client");
+        Log::info("Error occured when sending response");
     }
 }
 

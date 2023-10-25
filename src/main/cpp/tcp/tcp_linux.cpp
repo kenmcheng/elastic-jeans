@@ -16,9 +16,9 @@ namespace tcp {
 TcpListener::TcpListener(std::string ipAddress, int port, int workerPoolSize):
         ipAddress_(ipAddress), 
         port_(port),
-        socketAddress_len_(sizeof(socketAddress_)),
-        workers_(workerPoolSize) {
+        socketAddress_len_(sizeof(socketAddress_)) {
     
+    workers_ = std::make_unique<Workers>(workerPoolSize);
     socketAddress_.sin_family = AF_INET;
     socketAddress_.sin_port = htons(port_);
     socketAddress_.sin_addr.s_addr = inet_addr(ipAddress_.c_str());
@@ -66,7 +66,7 @@ void TcpListener::_listen() {
             else continue;
         }
 
-        workers_.handle(conn_socket_fd);
+        workers_->handle(conn_socket_fd);
     }
 }
 

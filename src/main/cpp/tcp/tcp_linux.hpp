@@ -31,7 +31,7 @@ private:
     struct sockaddr_in socketAddress_;
     unsigned int socketAddress_len_;
     bool stop_ = false;
-    Workers workers_;
+    std::unique_ptr<Workers> workers_;
 
     void _listen();
     int _accept();
@@ -40,7 +40,7 @@ private:
 
 template<typename F>
 int TcpListener::registerCbFunc(F&& f) {
-    return workers_.registerCbFunc(std::forward<F>(f));
+    return workers_->registerCbFunc(std::forward<F>(f));
 }
 
 } // namespace tcp

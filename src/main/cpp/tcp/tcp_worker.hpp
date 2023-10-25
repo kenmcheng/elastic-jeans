@@ -1,7 +1,7 @@
 #ifndef _ELASTICJEANS_TCP_WORKER_H
 #define _ELASTICJEANS_TCP_WORKER_H
 
-#include "../util/thread_pool.hpp"
+#include "../util/thread_pool_exec.hpp"
 
 #include <queue>
 #include <memory>
@@ -17,7 +17,7 @@ class Workers {
 public:
     explicit Workers(size_t poolSize = 32) :
         poolSize_(poolSize) {
-        threadPool_ = std::make_unique<ThreadPool>(poolSize);
+        threadPoolExecutor_ = std::make_unique<ThreadPoolExecutor>(poolSize);
     }
 
     template<typename F>
@@ -28,10 +28,10 @@ public:
     void sendResponse(int conn_socket_fd, const std::string& response);
 
 private:
-    std::unique_ptr<ThreadPool> threadPool_;
     size_t poolSize_;
     int bufferSize_ = 0X200;
     std::vector<uniqueCbFn> fnChain;
+    std::unique_ptr<ThreadPoolExecutor> threadPoolExecutor_;
 
     void doHandle(int conn_socket_fd);
 
