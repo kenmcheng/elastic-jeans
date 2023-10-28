@@ -3,6 +3,7 @@
 #include "http_request.hpp"
 #include "http_response.hpp"
 #include "http_header.hpp"
+#include "../tcp/tcp_connection.hpp"
 
 #include <string>
 #include <sstream>
@@ -12,7 +13,8 @@ namespace http {
 
 int HttpServer::start() {
     Log::info(ipAddress_ + ":" + std::to_string(port_) );
-    tcp_.registerCbFunc([](std::string& req, std::string& resp) -> int {
+    tcp_.registerCbFunc([](tcp::Connection& tcpConnection) -> int {
+        std::string received = tcpConnection.receiveData();
         std::string content =  "200 ok 成功!!!";
 
         http::Headers headers;
@@ -23,7 +25,8 @@ int HttpServer::start() {
         std::ostringstream osstream;
         osstream << "HTTP/1.1 200 OK\n" << headers.str() << "\n"
             << content;
-        resp = osstream.str();
+        
+        tcpConnection.sendData(osstream.str());
         return 0;
     });
 

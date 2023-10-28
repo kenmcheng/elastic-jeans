@@ -17,7 +17,7 @@ public:
     TaskQueue &operator=(const TaskQueue &) = delete;
     TaskQueue &operator=(TaskQueue &&) = delete;
 
-    explicit TaskQueue(long long maxQueueSize = __LONG_LONG_MAX__) : maxQueueSize_(maxQueueSize) {};
+    explicit TaskQueue(long long maxQueueSize = __LONG_LONG_MAX__) : maxQueueSize_{maxQueueSize} {};
 
     ~TaskQueue();
 

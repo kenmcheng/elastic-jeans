@@ -1,9 +1,9 @@
 #ifndef _ELASTICJEANS_THREAD_POOL_H
 #define _ELASTICJEANS_THREAD_POOL_H
 
-#include <functional>
-#include <future>
-#include <queue>
+// #include <functional>
+// #include <future>
+// #include <queue>
 #include <thread>
 #include <vector>
 

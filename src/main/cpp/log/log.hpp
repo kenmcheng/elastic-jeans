@@ -14,16 +14,22 @@ public:
     const static int ERROR = 5;
     const static int FATAL = 6;
 
+    // static Log fatal;
+
     static void trace(const std::string& message);
     static void info(const std::string& message);
     static void debug(const std::string& message);
     static void warn(const std::string& message);
     static void error(const std::string& message);
     static void fatal(const std::string& message);
+
     static void log(const std::string& message);
+
+    Log(int level) : logLevel_{level} {}
+
 private:
     static std::string filePath;
-    int logLevel = INFO;
+    int logLevel_;
 
 };
 

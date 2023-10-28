@@ -1,17 +1,19 @@
 #ifndef _ELASTICJEANS_TCP_LINUX_H
 #define _ELASTICJEANS_TCP_LINUX_H
 
+#include "tcp_worker.hpp"
+
 #include <string>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
-#include "tcp_worker.hpp"
 
 namespace elasticJeans {
 
 namespace tcp {
 
 class TcpListener {
+    friend class Workers;
 
 public:
     TcpListener(std::string ipAddress = "127.0.0.1", int port = 8080, int workerPoolSize = 32);
@@ -25,16 +27,16 @@ public:
     int registerCbFunc(F&& f);
 
 private:
-    std::string ipAddress_;
+    std::string ipv4Address_;
     int port_;
-    int socket_fd_;
+    int socket_ipv4_fd_;
     struct sockaddr_in socketAddress_;
     unsigned int socketAddress_len_;
     bool stop_ = false;
     std::unique_ptr<Workers> workers_;
 
-    void _listen();
-    int _accept();
+    void _listen_ipv4();
+    int _accept_ipv4();
 };
 
 

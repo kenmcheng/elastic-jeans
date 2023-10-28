@@ -5,7 +5,7 @@
 namespace elasticJeans {
 
 ThreadPoolExecutor::ThreadPoolExecutor(size_t maxWorkers, long long maxQueueSize) :
-    maxWorkers_(maxWorkers), stop_(false) {
+    maxWorkers_{maxWorkers}, stop_{false} {
     tasks_ = std::make_unique<TaskQueue>(maxQueueSize);
     threadPool_ = std::make_unique<ThreadPool>();
     this->init();
