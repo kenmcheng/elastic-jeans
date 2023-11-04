@@ -14,7 +14,7 @@ class Method {
     static const std::string METHODS[METHODS_LEN];
 
 public:
-    enum Value {
+    enum MethodEnum {
         GET,
         HEAD,
         POST,
@@ -29,28 +29,28 @@ public:
 
     Method() = default;
 
-    Method(Value v) : value_(v) {}
+    Method(MethodEnum v) : methodEnum_(v) {}
 
     Method(std::string methodStr) {
         this->str(methodStr);
     }
 
-    constexpr bool operator==(Method a) const { return value_ == a.value_; }
+    constexpr bool operator==(Method m) const { return methodEnum_ == m.methodEnum_; }
 
-    constexpr bool operator!=(Method a) const { return value_ != a.value_; }
+    constexpr bool operator!=(Method m) const { return methodEnum_ != m.methodEnum_; }
 
     void str(std::string methodStr) {
         auto mp = std::find(METHODS, METHODS+METHODS_LEN, methodStr);
         if (mp  == end(METHODS)) {
-            value_ = Value(9);
+            methodEnum_ = MethodEnum::UNDEFINED;
         } else
-            value_ = Value(mp-begin(METHODS));
+            methodEnum_ = MethodEnum(mp-begin(METHODS));
     }
 
-    std::string str() { return METHODS[value_]; }
+    std::string str() { return METHODS[methodEnum_]; }
 
 private:
-    Value value_;
+    MethodEnum methodEnum_;
 
 };
 
