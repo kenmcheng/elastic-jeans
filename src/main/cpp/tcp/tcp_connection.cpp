@@ -20,7 +20,7 @@ Connection::Connection(int socket_fd, std::string initIP, int initPort, std::str
 }
 
 Connection::~Connection() {
-    fin();
+    if (!closed) fin();
 }
 
 std::string Connection::receiveData(int bufferSize) {
@@ -64,6 +64,7 @@ void Connection::sendData(const std::string& data) {
 }
 
 void Connection::fin() {
+    closed = true;
     close(conn_socket_fd_);
 }
 

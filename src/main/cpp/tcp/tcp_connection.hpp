@@ -17,13 +17,14 @@ public:
 
     ~Connection();
 
-    std::string receiveData(int bufferSize = 0x200);
+    std::string receiveData(int bufferSize = 0x800);
 
     void sendData(const std::string& date);
 
     void fin();
 
 private:
+    bool closed = false;
     int conn_socket_fd_;
     std::string initiatorIP_;
     int initiatorPort_;

@@ -2,9 +2,11 @@
 #define _ELASTICJEANS_HTTP_LINUX_H
 
 #include "../tcp/tcp_linux.hpp"
+#include "../tcp/tcp_connection.hpp"
 
 #include <string>
 #include <iostream>
+#include <csignal>
 
 namespace elasticJeans {
 namespace http {
@@ -15,12 +17,14 @@ public:
         ipAddress_(ipAddress),
         port_(port),
         tcp_(ipAddress, port) {
-            
+        
     }
 
     ~HttpServer() = default;
     
     int start();
+
+    int receive(tcp::Connection& tcpConnection);
 
 private:
     std::string ipAddress_;

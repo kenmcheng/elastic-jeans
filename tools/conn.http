@@ -1,1 +1,13 @@
-GET http://127.0.0.1:8080
+GET http://127.0.0.1:8080/api/test
+Content-Type: application/json
+
+{
+
+}
+
+###
+GET https://www.cjcf.com.tw/CG02.aspx
+
+
+###
+GET http://10.240.40.163:6600/

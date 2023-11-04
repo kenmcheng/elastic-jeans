@@ -34,11 +34,23 @@ void Workers::doHandle(int conn_socket_fd, const sockaddr_in& scaddr) {
 
         for (auto& cb : fnChain) {
             int code = (*cb)(conn);
-            if (code) {
-                close(conn_socket_fd);
-                break;
+
+            switch (code) {
+                case 0:
+                    break;
+                case 1:
+                    goto endloop;
+                    break;
+                case 2:
+                default:
+                    close(conn_socket_fd);
+                    goto endloop;
+                    break;
             }
         }
+
+    endloop:
+        {}
 
     } catch (...) {
         Log::error("Failed to handle reuqest");
