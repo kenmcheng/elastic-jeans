@@ -35,9 +35,9 @@ int HttpServer::receive(tcp::Connection& tcpConnection) {
 
     http::HeaderList& headers = resp.getHeaders();
     // headers["Content-Encoding"] = "gzip";
-    // headers["Server"] = "webserver";
+    headers["Server"] = "webserver";
     headers["Content-Type"] = "text/html;charset=UTF-8";
-    headers["Set-Cookie"] = "EJ_SessionId=saiodhwaehlksaggaas";
+    headers["Set-Cookie"] = "EJ_SessionId=saiodhwaehlksaggaas; path=/";
     headers["Connection"] = "close";
     headers["Vary"] = "Accept-Encoding";
     headers["X-Frame-Options"] = "SAMEORIGIN";

@@ -25,7 +25,7 @@ std::string HttpResponse::toString() {
     if (STATUS.count(status_))
         osstream <<  " " << STATUS[status_];
 
-    osstream << "\n" << headers_.str() << "\n"
+    osstream << CRLF << headers_.str() << CRLF
         << content_;
 
     return osstream.str();
@@ -35,7 +35,7 @@ void HttpResponse::setCurrentDate() {
     char buf[1000];
     time_t now = time(0);
     struct tm tm = *gmtime(&now);
-    static char* dateFormat = "%a, %d %b %Y %H:%M:%S %Z";
+    static const char* dateFormat = "%a, %d %b %Y %H:%M:%S %Z";
     strftime(buf, sizeof buf, dateFormat, &tm);
 
     headers_["Date"] = buf;

@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <string>
+#include <algorithm>
 
 namespace elasticJeans {
 
@@ -14,7 +15,7 @@ inline std::vector<std::string> tokenize(const std::string& s,
                                  size_t begin = 0, 
                                  size_t end = std::string::npos) {
     if (delimiter.size() == 0)  return {s};
-    int sz = s.size();
+    size_t sz = s.size();
     std::vector<std::string> tokens;
     int found = -delimiter.size();
     while ((found = s.find(delimiter, begin)) < end) {
@@ -25,8 +26,8 @@ inline std::vector<std::string> tokenize(const std::string& s,
         tokens.push_back(std::move(s.substr(begin, found - begin)));
         begin = found + delimiter.size();
     }
-    if (begin < sz)
-        tokens.push_back(std::move(s.substr(begin, sz - begin)));
+    if (begin < sz && begin < end)
+        tokens.push_back(std::move(s.substr(begin, std::min(sz, end) - begin)));
 
     return tokens;
 }

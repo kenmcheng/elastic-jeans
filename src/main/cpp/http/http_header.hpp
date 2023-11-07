@@ -7,6 +7,8 @@
 namespace elasticJeans {
 namespace http {
 
+const std::string CRLF = "\r\n";
+
 class Header {
 public:
     using vec_str = std::vector<std::string>;

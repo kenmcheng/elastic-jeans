@@ -40,7 +40,6 @@ std::string Connection::receiveData(int bufferSize) {
         osstream << std::string(buffer, fetched);
         bytesReceived += fetched;
     }
-    Log::info(osstream.str());
     
     if (bytesReceived == 0) {
         Log::error("Failed to read bytes from client socket connection, last read: " + std::to_string(fetched));

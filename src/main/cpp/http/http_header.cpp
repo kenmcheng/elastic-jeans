@@ -20,7 +20,7 @@ std::string HeaderList::str() const {
     std::ostringstream osstream;
     for (auto& [k, vals] : headers_) {
         for (auto& v : vals)
-            osstream << k << ": "  << v << "\n";
+            osstream << k << ": "  << v << CRLF;
     }
     return osstream.str();
 }

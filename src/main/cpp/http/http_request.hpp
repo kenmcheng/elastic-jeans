@@ -55,7 +55,8 @@ private:
 };
 
 class HttpRequest {
-    static const std::string REQUSET_DELIMITER;
+    static const std::string REQUSET_DELIMITER_CRLF;
+    static const std::string REQUSET_DELIMITER_LF;
     static const std::string HEADER_DELIMITER;
 public:
     HttpRequest() = default;
