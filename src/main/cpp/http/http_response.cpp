@@ -1,6 +1,7 @@
 #include "http_response.hpp"
 
 #include <sstream>
+#include <time.h>
 
 namespace elasticJeans {
 namespace http {
@@ -10,13 +11,34 @@ void HttpResponse::setContent(std::string content) {
     this->content_ = std::move(content);
 }
 
+std::string HttpResponse::prepare() {
+    if (!headers_.exist("Date"))
+        setCurrentDate();
+
+    return toString();
+}
+
 std::string HttpResponse::toString() {
     
     std::ostringstream osstream;
-    osstream << "HTTP/1.1 200 OK\n" << headers_.str() << "\n"
+    osstream << "HTTP/" << version_ << " " << status_;
+    if (STATUS.count(status_))
+        osstream <<  " " << STATUS[status_];
+
+    osstream << "\n" << headers_.str() << "\n"
         << content_;
 
     return osstream.str();
+}
+
+void HttpResponse::setCurrentDate() {
+    char buf[1000];
+    time_t now = time(0);
+    struct tm tm = *gmtime(&now);
+    static char* dateFormat = "%a, %d %b %Y %H:%M:%S %Z";
+    strftime(buf, sizeof buf, dateFormat, &tm);
+
+    headers_["Date"] = buf;
 }
 
 } // namespace http

@@ -1,5 +1,5 @@
 #include "http_linux.hpp"
-#include "../log/log.hpp"
+#include <log/log.hpp>
 #include "http_request.hpp"
 #include "http_response.hpp"
 #include "http_header.hpp"
@@ -31,27 +31,19 @@ int HttpServer::receive(tcp::Connection& tcpConnection) {
         return 0;
     }
 
-    std::string content =  "<html><body>200 ok successful!!!</body></html>";
+    std::string content = "<html><head><title>Denim EJ</title></head><body>200 ok successful!!!</body></html>";
 
-    char buf[1000];
-    time_t now = time(0);
-    struct tm tm = *gmtime(&now);
-    strftime(buf, sizeof buf, "%a, %d %b %Y %H:%M:%S %Z", &tm);
-
-    http::Headers& headers = resp.getHeaders();
-
-    headers["Server"] = "webserver";
-    headers["Content-Type"] = "text/html; charset=utf-8";
+    http::HeaderList& headers = resp.getHeaders();
     // headers["Content-Encoding"] = "gzip";
-    // headers["Cache-Control"] = "private,no-store";
+    // headers["Server"] = "webserver";
+    headers["Content-Type"] = "text/html;charset=UTF-8";
     headers["Set-Cookie"] = "EJ_SessionId=saiodhwaehlksaggaas";
     headers["Connection"] = "close";
-    headers["Date"] = buf;
     headers["Vary"] = "Accept-Encoding";
     headers["X-Frame-Options"] = "SAMEORIGIN";
-    // headers["Content-Length"] = std::to_string(content.size());
+ 
     resp.setContent(std::move(content));
-    tcpConnection.sendData(resp.toString());
+    tcpConnection.sendData(resp.prepare());
     return 0;
 }
 

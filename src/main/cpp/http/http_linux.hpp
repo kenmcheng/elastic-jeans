@@ -1,8 +1,8 @@
 #ifndef _ELASTICJEANS_HTTP_LINUX_H
 #define _ELASTICJEANS_HTTP_LINUX_H
 
-#include "../tcp/tcp_linux.hpp"
-#include "../tcp/tcp_connection.hpp"
+#include <tcp/tcp_linux.hpp>
+#include <tcp/tcp_connection.hpp>
 
 #include <string>
 #include <iostream>

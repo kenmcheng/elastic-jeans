@@ -13,6 +13,8 @@ file(GLOB HDRS src/main/cpp/**/*.hpp src/main/cpp/*.hpp)
 file(GLOB SRCS src/main/cpp/**/*.cpp src/main/cpp/*.cpp)
 
 add_library(${LIB} STATIC ${HDRS} ${SRCS})
+target_include_directories(${LIB} PUBLIC src/main/cpp)
+
 add_executable(${TARGET} src/main/cpp/main.cpp)
 target_link_libraries(${TARGET} ${LIB})
 

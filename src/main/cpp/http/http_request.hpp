@@ -29,7 +29,7 @@ public:
 
     Method() = default;
 
-    Method(MethodEnum v) : methodEnum_(v) {}
+    Method(MethodEnum m) : methodEnum_(m) {}
 
     Method(std::string methodStr) {
         this->str(methodStr);
@@ -64,14 +64,14 @@ public:
 
     void parse(const std::string& tcpData);
 
-    Headers& getHeaders() { return headers_; }
+    HeaderList& getHeaders() { return headers_; }
 
     std::string toString();
 
 private:
     std::string path_;
     Method method_;
-    Headers headers_;
+    HeaderList headers_;
     std::string payload_;
 
 };

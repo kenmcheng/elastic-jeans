@@ -1,5 +1,5 @@
 #include "tcp_connection.hpp"
-#include "../log/log.hpp"
+#include <log/log.hpp>
 
 #include <sstream>
 #include <unistd.h>
@@ -20,7 +20,7 @@ Connection::Connection(int socket_fd, std::string initIP, int initPort, std::str
 }
 
 Connection::~Connection() {
-    if (!closed) fin();
+    if (autoClose_ && !closed_) fin();
 }
 
 std::string Connection::receiveData(int bufferSize) {
@@ -40,6 +40,7 @@ std::string Connection::receiveData(int bufferSize) {
         osstream << std::string(buffer, fetched);
         bytesReceived += fetched;
     }
+    Log::info(osstream.str());
     
     if (bytesReceived == 0) {
         Log::error("Failed to read bytes from client socket connection, last read: " + std::to_string(fetched));
@@ -64,7 +65,7 @@ void Connection::sendData(const std::string& data) {
 }
 
 void Connection::fin() {
-    closed = true;
+    closed_ = true;
     close(conn_socket_fd_);
 }
 

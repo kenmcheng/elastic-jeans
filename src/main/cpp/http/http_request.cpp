@@ -1,6 +1,6 @@
 #include "http_request.hpp"
-#include "../util/string_util.hpp"
-#include "../log/log.hpp"
+#include <util/string_util.hpp>
+#include <log/log.hpp>
 
 #include <string>
 #include <vector>

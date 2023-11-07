@@ -1,11 +1,17 @@
 #ifndef _ELASTICJEANS_TCP_WORKER_H
 #define _ELASTICJEANS_TCP_WORKER_H
 #include "tcp_connection.hpp"
-#include "../util/thread_pool_exec.hpp"
+#include <util/thread_pool_exec.hpp>
 
 #include <queue>
 #include <memory>
 #include <arpa/inet.h>
+
+#define PROCEED 0
+#define INTERROPT_WO_CLOSE 1
+#define INTERRUPT_W_CLOSE 2
+
+
 
 namespace elasticJeans {
 namespace tcp {

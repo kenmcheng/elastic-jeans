@@ -4,21 +4,35 @@
 #include "http_header.hpp"
 
 #include <string>
+#include <unordered_map>
 
 namespace elasticJeans {
 namespace http {
 
+static std::unordered_map<int, std::string> STATUS {
+    {200, "OK"},
+    {400, "Bad Request"}
+};
+
 class HttpResponse {
 public:
 
-    Headers& getHeaders() { return headers_; }
+    HeaderList& getHeaders() { return headers_; }
 
     void setContent(std::string content);
+
+    std::string getContetn() { return content_; }
+
+    void setCurrentDate();
+
+    std::string prepare();
+
     std::string toString();
 
 private:
-    int status = 200;
-    Headers headers_;
+    int status_ = 200;
+    std::string version_ = "1.1";
+    HeaderList headers_;
     std::string content_;
 };
 

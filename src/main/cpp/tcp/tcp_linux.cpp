@@ -1,6 +1,6 @@
 #include "tcp_linux.hpp"
-#include "../log/log.hpp"
-#include "../http/http_header.hpp"
+#include <log/log.hpp>
+#include <http/http_header.hpp>
 
 #include <iostream>
 #include <sstream>

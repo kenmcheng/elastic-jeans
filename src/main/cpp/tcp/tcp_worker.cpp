@@ -1,6 +1,6 @@
 #include "tcp_worker.hpp"
 #include "tcp_linux.hpp"
-#include "../log/log.hpp"
+#include <log/log.hpp>
 
 #include <sstream>
 #include <unistd.h>
@@ -36,12 +36,13 @@ void Workers::doHandle(int conn_socket_fd, const sockaddr_in& scaddr) {
             int code = (*cb)(conn);
 
             switch (code) {
-                case 0:
+                case PROCEED:
                     break;
-                case 1:
+                case INTERROPT_WO_CLOSE:
+                    conn.setAutoClose(false);
                     goto endloop;
                     break;
-                case 2:
+                case INTERRUPT_W_CLOSE:
                 default:
                     close(conn_socket_fd);
                     goto endloop;

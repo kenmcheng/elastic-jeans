@@ -4,22 +4,23 @@
 namespace elasticJeans {
 namespace http {
 
-std::string& Headers::operator[](const std::string& headerName) {
+Header& HeaderList::operator[](const std::string& headerName) {
     return this->get(headerName);
 }
 
-std::string& Headers::get(const std::string& headerName) {
+Header& HeaderList::get(const std::string& headerName) {
     return headers_[headerName];
 }
 
-void Headers::set(std::string headerName, std::string value) {
-    headers_[headerName] = move(value);
+void HeaderList::set(std::string headerName, std::string value) {
+    headers_[headerName] = std::move(value);
 }
 
-std::string Headers::str() const {
+std::string HeaderList::str() const {
     std::ostringstream osstream;
-    for (auto& [k, v] : headers_) {
-        osstream << k << ": "  << v << "\n";
+    for (auto& [k, vals] : headers_) {
+        for (auto& v : vals)
+            osstream << k << ": "  << v << "\n";
     }
     return osstream.str();
 }

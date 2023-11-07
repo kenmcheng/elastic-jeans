@@ -17,6 +17,10 @@ public:
 
     ~Connection();
 
+    void setAutoClose(bool autoClose)  { this->autoClose_ = autoClose; }
+
+    bool getAutoClose() { return autoClose_; }
+
     std::string receiveData(int bufferSize = 0x800);
 
     void sendData(const std::string& date);
@@ -24,7 +28,8 @@ public:
     void fin();
 
 private:
-    bool closed = false;
+    bool closed_ = false;
+    bool autoClose_ = true;
     int conn_socket_fd_;
     std::string initiatorIP_;
     int initiatorPort_;

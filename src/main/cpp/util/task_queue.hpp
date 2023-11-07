@@ -2,7 +2,7 @@
 #define _ELASTICJEANS_Task_QUEUE_H
 
 #include "thread_pool.hpp"
-#include "../log/log.hpp"
+#include <log/log.hpp>
 
 #include <functional>
 #include <future>
