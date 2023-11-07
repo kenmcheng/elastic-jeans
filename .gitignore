@@ -12,3 +12,5 @@ Makefile
 *.exe
 *.app
 *.lib.a
+
+*/*.http
