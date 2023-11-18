@@ -10,10 +10,10 @@ namespace elasticJeans {
 namespace http {
 
 class Method {
+public:
     static const int METHODS_LEN = 10;
     static const std::string METHODS[METHODS_LEN];
 
-public:
     enum MethodEnum {
         GET,
         HEAD,
@@ -47,6 +47,8 @@ public:
             methodEnum_ = MethodEnum(mp-begin(METHODS));
     }
 
+    MethodEnum value() const { return methodEnum_; }
+
     std::string str() { return METHODS[methodEnum_]; }
 
 private:
@@ -64,6 +66,12 @@ public:
     HttpRequest(const std::string& tcpData) { parse(tcpData); }
 
     void parse(const std::string& tcpData);
+
+    // void clear();
+
+    Method& getMethod() { return method_; }
+
+    std::string& getPath() { return path_; }
 
     HeaderList& getHeaders() { return headers_; }
 

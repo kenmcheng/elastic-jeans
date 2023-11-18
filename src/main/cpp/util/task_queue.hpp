@@ -25,8 +25,8 @@ public:
 
     void add(std::function<void()>& fn);
 
-    template <typename F, typename... ARGS>
-    std::future<std::result_of_t<F(ARGS ...)>> add(F&& f, ARGS&&... args);
+    template <typename F, typename... Args>
+    std::future<std::result_of_t<F(Args ...)>> add(F&& f, Args&&... args);
 
     std::function<void()> fetch();
 
@@ -45,12 +45,12 @@ private:
 
 };
 
-template <typename F, typename... ARGS>
-std::future<std::result_of_t<F(ARGS ...)>> TaskQueue::add(F&& f, ARGS&&... args) {
-    using return_type = std::result_of_t<F(ARGS...)>;
+template <typename F, typename... Args>
+std::future<std::result_of_t<F(Args ...)>> TaskQueue::add(F&& f, Args&&... args) {
+    using return_type = std::result_of_t<F(Args...)>;
 
     auto task = std::make_shared<std::packaged_task<return_type()>> (
-        std::bind(std::forward<F>(f), std::forward<ARGS>(args)...)
+        std::bind(std::forward<F>(f), std::forward<Args>(args)...)
     );
 
     std::future<return_type> res = task->get_future();

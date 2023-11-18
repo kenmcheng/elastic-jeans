@@ -45,6 +45,8 @@ public:
 
     std::string str() const;
 
+    void clear();
+
     bool exist(const std::string& key) { return headers_.count(key); } 
 
 private:

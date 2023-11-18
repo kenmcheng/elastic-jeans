@@ -3,6 +3,10 @@
 
 #include <tcp/tcp_linux.hpp>
 #include <tcp/tcp_connection.hpp>
+#include "http_request.hpp"
+#include "http_response.hpp"
+
+#include <restful/rest_api_register.hpp>
 
 #include <string>
 #include <iostream>
@@ -10,6 +14,9 @@
 
 namespace elasticJeans {
 namespace http {
+
+extern thread_local HttpRequest req;
+extern thread_local HttpResponse resp;
 
 class HttpServer {
 public:
@@ -26,10 +33,14 @@ public:
 
     int receive(tcp::Connection& tcpConnection);
 
+    RestApiRegister& getRestApiRegister() { return apis; }
+
 private:
     std::string ipAddress_;
     int port_;
     tcp::TcpListener tcp_;
+
+    RestApiRegister apis;
 };
 
 } // http

@@ -7,4 +7,4 @@ namespace elasticJeans {
 
 } // namespace elasticJeans
 
-#endif
+#endif // _ELASTICJEANS_COMPRESSOR_H

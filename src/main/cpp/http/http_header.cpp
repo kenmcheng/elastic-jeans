@@ -25,5 +25,9 @@ std::string HeaderList::str() const {
     return osstream.str();
 }
 
+void HeaderList::clear() {
+    headers_.clear();
+}
+
 } // http
 } // namespace elasticJeans

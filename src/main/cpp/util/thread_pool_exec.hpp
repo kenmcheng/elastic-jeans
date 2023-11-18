@@ -19,8 +19,8 @@ public:
 
     void stop();
 
-    template <class F, class... ARGS>
-    std::future<std::result_of_t<F(ARGS ...)>> submit(F&& f, ARGS&&... args);
+    template <class F, class... Args>
+    std::future<std::result_of_t<F(Args ...)>> submit(F&& f, Args&&... args);
 
 private:
     bool stop_;
@@ -32,11 +32,11 @@ private:
     void init();
 };
 
-template <typename F, typename... ARGS>
-std::future<std::result_of_t<F(ARGS ...)>> ThreadPoolExecutor::submit(F&& f, ARGS&&... args) {
+template <typename F, typename... Args>
+std::future<std::result_of_t<F(Args ...)>> ThreadPoolExecutor::submit(F&& f, Args&&... args) {
     if (stop_)
         throw std::runtime_error("Thread pool executor has been stopped.");
-    return tasks_->add(std::forward<F>(f), std::forward<ARGS>(args)...);
+    return tasks_->add(std::forward<F>(f), std::forward<Args>(args)...);
 }
 
 } // namespace elasticJeans

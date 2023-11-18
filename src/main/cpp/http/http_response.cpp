@@ -18,6 +18,12 @@ std::string HttpResponse::prepare() {
     return toString();
 }
 
+void HttpResponse::clear() {
+    status_ = 200;
+    content_.erase();
+    headers_.clear();
+}
+
 std::string HttpResponse::toString() {
     
     std::ostringstream osstream;

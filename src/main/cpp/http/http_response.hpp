@@ -11,7 +11,8 @@ namespace http {
 
 static std::unordered_map<int, std::string> STATUS {
     {200, "OK"},
-    {400, "Bad Request"}
+    {400, "Bad Request"},
+    {404, "Not Found"}
 };
 
 class HttpResponse {
@@ -27,7 +28,11 @@ public:
 
     std::string prepare();
 
+    void clear();
+
     std::string toString();
+
+    void setStatus(int status) { status_= status; }
 
 private:
     int status_ = 200;
