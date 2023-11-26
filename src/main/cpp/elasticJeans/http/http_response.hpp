@@ -22,7 +22,7 @@ public:
 
     void setContent(std::string content);
 
-    std::string getContetn() { return content_; }
+    std::string getContent() { return content_; }
 
     void setCurrentDate();
 

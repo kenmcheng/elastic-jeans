@@ -38,7 +38,7 @@ void Workers::doHandle(int conn_socket_fd, const sockaddr_in& scaddr) {
             switch (code) {
                 case PROCEED:
                     break;
-                case INTERROPT_WO_CLOSE:
+                case INTERRUPT_WO_CLOSE:
                     conn.setAutoClose(false);
                     goto endloop;
                     break;

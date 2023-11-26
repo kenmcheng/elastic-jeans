@@ -10,7 +10,8 @@ Makefile
 # executable
 *.o
 *.exe
-*.app
-lib*.a
 
+# Misc
+build
+libs/*
 */*.http

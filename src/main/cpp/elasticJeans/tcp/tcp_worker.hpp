@@ -8,7 +8,7 @@
 #include <arpa/inet.h>
 
 #define PROCEED 0
-#define INTERROPT_WO_CLOSE 1
+#define INTERRUPT_WO_CLOSE 1
 #define INTERRUPT_W_CLOSE 2
 
 

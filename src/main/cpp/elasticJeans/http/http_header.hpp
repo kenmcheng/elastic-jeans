@@ -7,7 +7,7 @@
 namespace elasticJeans {
 namespace http {
 
-const std::string CRLF = "\r\n";
+constexpr char CRLF[] {"\r\n"};
 
 class Header {
 public:

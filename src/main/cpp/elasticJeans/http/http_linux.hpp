@@ -8,6 +8,7 @@
 
 #include <restful/rest_api_register.hpp>
 
+#include <memory>
 #include <string>
 #include <iostream>
 #include <csignal>
@@ -15,15 +16,16 @@
 namespace elasticJeans {
 namespace http {
 
-extern thread_local HttpRequest req;
-extern thread_local HttpResponse resp;
+extern thread_local std::unique_ptr<HttpRequest> reqPtr;
+extern thread_local std::unique_ptr<HttpResponse> respPtr;
 
 class HttpServer {
 public:
-    HttpServer(std::string ipAddress, int port):
+    HttpServer(std::string ipAddress, int port, bool withSecure = false):
         ipAddress_(ipAddress),
         port_(port),
-        tcp_(ipAddress, port) {
+        tcp_(ipAddress, port),
+        withSecure_(withSecure) {
         
     }
 
@@ -33,12 +35,15 @@ public:
 
     int receive(tcp::Connection& tcpConnection);
 
+    int tlsHandshake(tcp::Connection& tcpConnection);
+
     RestApiRegister& getRestApiRegister() { return apis; }
 
 private:
     std::string ipAddress_;
     int port_;
     tcp::TcpListener tcp_;
+    bool withSecure_;
 
     RestApiRegister apis;
 };

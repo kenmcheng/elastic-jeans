@@ -11,7 +11,7 @@ namespace http {
 
 class Method {
 public:
-    static const int METHODS_LEN = 10;
+    static constexpr int METHODS_LEN = 10;
     static const std::string METHODS[METHODS_LEN];
 
     enum MethodEnum {
@@ -67,7 +67,7 @@ public:
 
     void parse(const std::string& tcpData);
 
-    // void clear();
+    void setMethod(const Method& method) { this->method_ =  method; }
 
     Method& getMethod() { return method_; }
 
@@ -75,7 +75,13 @@ public:
 
     HeaderList& getHeaders() { return headers_; }
 
+    void setPayload(const std::string& payload) { this->payload_ = payload; }
+
+    std::string& getPayload() { return payload_; }
+
     std::string toString();
+    
+    void clear();
 
 private:
     std::string path_;
