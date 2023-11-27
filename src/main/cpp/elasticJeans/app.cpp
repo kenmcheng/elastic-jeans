@@ -39,7 +39,7 @@ App& App::http(const std::string& ip, int port) {
 }
 
 App& App::https(const std::string& ip, int port) {
-    this->serverPtrs_.push_back(std::make_unique<http::HttpServer>(ip, port));
+    this->serverPtrs_.push_back(std::make_unique<http::HttpServer>(ip, port, true));
     return *this;
 }
 

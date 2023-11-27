@@ -6,7 +6,7 @@
 #include "http_request.hpp"
 #include "http_response.hpp"
 
-#include <restful/rest_api_register.hpp>
+#include <restful/rest_api_registry.hpp>
 
 #include <memory>
 #include <string>
@@ -37,7 +37,7 @@ public:
 
     int tlsHandshake(tcp::Connection& tcpConnection);
 
-    RestApiRegister& getRestApiRegister() { return apis; }
+    // RestApiRegistry& getRestApiRegister() { return apis; }
 
 private:
     std::string ipAddress_;
@@ -45,7 +45,7 @@ private:
     tcp::TcpListener tcp_;
     bool withSecure_;
 
-    RestApiRegister apis;
+    // RestApiRegistry apis;
 };
 
 } // http

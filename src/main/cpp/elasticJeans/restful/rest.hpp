@@ -98,11 +98,6 @@ RestAPI(const std::string& path, F&& f) -> RestAPI<M, typename Fn_type<decltype(
 template<http::Method::MethodEnum M, typename F>
 RestAPI(const std::string& path, F* f) -> RestAPI<M, F>;
 
-template<http::Method::MethodEnum M, typename F>
-RestAPI<M, F> Rest(const std::string& path, F&& f) {
-    return RestAPI<M, F>(path, std::forward<F>(f));
-}
-
 } // namespace elasticJeans
 
 #endif

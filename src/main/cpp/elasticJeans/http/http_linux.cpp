@@ -40,7 +40,7 @@ int HttpServer::receive(tcp::Connection& tcpConnection) {
         return 0;
     }
 
-    auto apiOpt = apis.lookFor(reqPtr->getMethod(), reqPtr->getPath());
+    auto apiOpt = RestApiRegistry::getInstance().lookFor(reqPtr->getMethod(), reqPtr->getPath());
 
     if (apiOpt.has_value()) {
         apiOpt->get()->invoke();

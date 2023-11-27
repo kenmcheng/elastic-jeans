@@ -1,5 +1,5 @@
-#ifndef _ELASTICJEANS_REST_API_REGISTER_H
-#define _ELASTICJEANS_REST_API_REGISTER_H
+#ifndef _ELASTICJEANS_REST_API_REGISTRY_H
+#define _ELASTICJEANS_REST_API_REGISTRY_H
 
 #include "rest.hpp"
 
@@ -8,11 +8,13 @@
 
 namespace elasticJeans {
 
-class RestApiRegister {
+class RestApiRegistry {
     using api_map = std::unordered_map<http::Method::MethodEnum, 
                         std::unordered_map<std::string, std::shared_ptr<RestBaseAPI>>>;
 public:
-    RestApiRegister();
+    RestApiRegistry();
+
+    static RestApiRegistry& getInstance();
 
     template<http::Method::MethodEnum M ,typename F>
     void add(const RestAPI<M, F>& restApi) {
@@ -32,6 +34,13 @@ private:
     std::unique_ptr<api_map> depotPtr_;
 
 };
+
+template<http::Method::MethodEnum M, typename F>
+RestAPI<M, F> Rest(const std::string& path, F&& f) {
+    auto restApi = RestAPI<M, F>(path, std::forward<F>(f));
+    RestApiRegistry::getInstance().add(restApi);
+    return restApi;
+}
 
 } // namespace elasticJeans
 
