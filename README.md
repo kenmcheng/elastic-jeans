@@ -16,7 +16,6 @@ The following tools have to be installed in your linux environment
 cmake CMakeLists.txt && make
 ```
 
-
 ## Usage
 ```
 #include <elasticJeans/jeans.hpp>
@@ -25,10 +24,10 @@ int main() {
     std::string ip = "127.0.0.1";
     int port = 8080;
     
-    ej::app(ip, port);
-    ej::start();
+    ej::app()
+        .http(ip, port)
+        .start();
 
     return 0;
 }
 ```
-

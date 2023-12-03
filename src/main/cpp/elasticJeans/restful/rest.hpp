@@ -82,7 +82,7 @@ public:
     }
 
     template<typename... Args>
-    std::result_of<F> invoke(Args&&... args) {
+    auto invoke(Args&&... args) {
         return f_(args...);
     }
 
