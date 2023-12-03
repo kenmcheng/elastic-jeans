@@ -5,6 +5,9 @@
 namespace elasticJeans {
 
 const char JsonBase::skippableChars[4] {' ', '\n', '\r', '\t'};
+const char JsonBase::openningChars[3] {'{', '[', '"'};
+const char JsonBase::closingChars[3] {'}', ']', '"'};
+const char JsonNumber::mathChars[5] {'+', '-', '.', 'E', 'e'};
 
 JsonBase& JsonBase::operator[](const std::string& attr) {
     return *this;
@@ -15,13 +18,23 @@ JsonBase& JsonBase::operator=(const std::string& value) {
     return *this;
 }
 
-int JsonBase::parse(const std::string& jsonStr, size_t begin, size_t end) {
+size_t JsonBase::parse(const std::string& jsonStr, size_t begin, size_t end) {
     return invalid();
 }
 
 bool JsonBase::skippable(const std::string& jsonStr, size_t idx) {
     return std::find(std::begin(skippableChars), std::end(skippableChars), 
             jsonStr[idx]) != std::end(skippableChars);
+}
+
+bool JsonBase::isOpening(const std::string& jsonStr, size_t idx) {
+    return std::find(std::begin(openningChars), std::end(openningChars), 
+            jsonStr[idx]) != std::end(openningChars);
+}
+
+bool JsonBase::isClosing(const std::string& jsonStr, size_t idx) {
+    return std::find(std::begin(closingChars), std::end(closingChars), 
+            jsonStr[idx]) != std::end(closingChars);
 }
 
 std::string JsonBase::parseQuoted(const std::string& jsonStr, size_t& from) {
@@ -74,7 +87,7 @@ JsonBase& JsonObject::operator[](const std::string& attr) {
     return *(jsonObject_.at(attr));
 }
 
-int JsonObject::parse(const std::string& jsonStr, size_t begin, size_t end) {
+size_t JsonObject::parse(const std::string& jsonStr, size_t begin, size_t end) {
     size_t idx = begin;
     end = std::min(jsonStr.size(), end);
     bool openCurlyBrace = false;
@@ -94,7 +107,7 @@ int JsonObject::parse(const std::string& jsonStr, size_t begin, size_t end) {
                 auto jsonObjPtr = std::make_shared<JsonObject>();
                 jsonObject_[std::move(attr)] = jsonObjPtr;
                 idx = jsonObjPtr->parse(jsonStr, idx, end);
-                if (idx < 0) return invalid();
+                if (idx == std::string::npos) return invalid();
                 continue;
             }
             openCurlyBrace = true;
@@ -108,7 +121,7 @@ int JsonObject::parse(const std::string& jsonStr, size_t begin, size_t end) {
                 if (!allowNextAttr) return invalid();
                 attr = parseQuoted(jsonStr, idx);
                 allowNextAttr = false;
-                if (!valid()) return -1;
+                if (!valid()) return std::string::npos;
                 continue;
             }
             if (!colon) return invalid();
@@ -116,7 +129,7 @@ int JsonObject::parse(const std::string& jsonStr, size_t begin, size_t end) {
             jsonObject_[std::move(attr)] = jsonStringPtr;
             colon = false;
             idx = jsonStringPtr->parse(jsonStr, idx, end);
-            if (idx < 0) return invalid();
+            if (idx == std::string::npos) return invalid();
             continue;
         }
 
@@ -141,7 +154,7 @@ int JsonObject::parse(const std::string& jsonStr, size_t begin, size_t end) {
             auto jsonArrPtr = std::make_shared<JsonArray>();
             jsonObject_[std::move(attr)] = jsonArrPtr;
             idx = jsonArrPtr->parse(jsonStr, idx, end);
-            if (idx < 0) return invalid();
+            if (idx == std::string::npos) return invalid();
             continue;
         }
 
@@ -149,7 +162,7 @@ int JsonObject::parse(const std::string& jsonStr, size_t begin, size_t end) {
             auto jsonNumber = std::make_shared<JsonNumber>();
             jsonObject_[std::move(attr)] = jsonNumber;
             idx = jsonNumber->parse(jsonStr, idx, end);
-            if (idx < 0) return invalid();
+            if (idx == std::string::npos) return invalid();
             continue;
         }
 
@@ -185,10 +198,35 @@ int JsonObject::parse(const std::string& jsonStr, size_t begin, size_t end) {
 
     if (idx == end || !attr.empty()) return invalid();
 
-    return valid_ ? idx+1 : -1;
+    return valid_ ? idx+1 : std::string::npos;
 }
 
-int JsonArray::parse(const std::string& jsonStr, size_t begin, size_t end) {
+std::string JsonObject::toString(bool compact, int indent) {
+    std::ostringstream osstream;
+    std::string indentation = "";
+    std::string colon = compact ? ":" : ": ";
+    if (!compact)
+        for (int i = 0; i < indent; i++) indentation += "    ";
+    
+    osstream << '{';
+    if (!compact) osstream << '\n';
+    for (auto it = std::begin(jsonObject_); it != std::end(jsonObject_); it++) {
+        auto& [k, val] = *it;
+        if (!compact)
+            osstream << indentation << "    ";
+            
+        osstream << "\"" << k << "\"" << colon << val->toString(compact, indent+1);
+        if (std::next(it) != std::end(jsonObject_)) {
+            osstream << ",";
+        }
+        if (!compact) osstream << "\n";
+    }
+    if (!compact) osstream << indentation;
+    osstream << '}';
+    return osstream.str();
+}
+
+size_t JsonArray::parse(const std::string& jsonStr, size_t begin, size_t end) {
     size_t idx = begin;
     end = std::min(jsonStr.size(), end);
     bool openBracket = false;
@@ -205,14 +243,14 @@ int JsonArray::parse(const std::string& jsonStr, size_t begin, size_t end) {
             idx++;
             continue;
         }
-        if (!allowNextValue) return invalid();
+        
         if (iterChar == '[') {
             if (openBracket) {
-                // if (!allowNextValue) return invalid();
+                if (!allowNextValue) return invalid();
                 auto jsonArrPtr = std::make_shared<JsonArray>();
                 jsonArray_.push_back(jsonArrPtr);
                 idx = jsonArrPtr->parse(jsonStr, idx, end);
-                if (idx < 0) return invalid();
+                if (idx == std::string::npos) return invalid();
                 allowNextValue = false;
                 continue;
             }
@@ -220,6 +258,10 @@ int JsonArray::parse(const std::string& jsonStr, size_t begin, size_t end) {
             idx++;
             continue;
         }
+        
+        if (iterChar == ']') break;
+
+        if (!allowNextValue) return invalid();
         allowNextValue = false;
         if (!openBracket) return invalid();
 
@@ -227,7 +269,7 @@ int JsonArray::parse(const std::string& jsonStr, size_t begin, size_t end) {
             auto jsonObjPtr = std::make_shared<JsonObject>();
             jsonArray_.push_back(jsonObjPtr);
             idx = jsonObjPtr->parse(jsonStr, idx, end);
-            if (idx < 0) return invalid();
+            if (idx == std::string::npos) return invalid();
             continue;
         }
 
@@ -235,7 +277,7 @@ int JsonArray::parse(const std::string& jsonStr, size_t begin, size_t end) {
             auto jsonStringPtr = std::make_shared<JsonString>();
             jsonArray_.push_back(jsonStringPtr);
             idx = jsonStringPtr->parse(jsonStr, idx, end);
-            if (idx < 0) return invalid();
+            if (idx == std::string::npos) return invalid();
             continue;
         }
 
@@ -243,7 +285,7 @@ int JsonArray::parse(const std::string& jsonStr, size_t begin, size_t end) {
             auto jsonNumber = std::make_shared<JsonNumber>();
             jsonArray_.push_back(jsonNumber);
             idx = jsonNumber->parse(jsonStr, idx, end);
-            if (idx < 0) return invalid();
+            if (idx == std::string::npos) return invalid();
             continue;
         }
 
@@ -274,32 +316,51 @@ int JsonArray::parse(const std::string& jsonStr, size_t begin, size_t end) {
             continue;
         }
 
-        if (iterChar == ']') break;
-
         return invalid();
     }
+    
     if (idx == end) return invalid();
-    return valid_ ? idx+1 : -1;
+    return valid_ ? idx+1 : std::string::npos;
 }
 
-int JsonString::parse(const std::string& jsonStr, size_t begin, size_t end) {
+std::string JsonArray::toString(bool compact, int indent) {
+    std::ostringstream osstream;
+    osstream << '[';
+    for (auto it = std::begin(jsonArray_); it != std::end(jsonArray_); it++) {
+        auto ptr = *it;
+        osstream << ptr->toString();
+        if (std::next(it) != std::end(jsonArray_)) {
+            osstream << ",";
+        }
+    }
+    osstream << ']';
+    return osstream.str();
+}
+
+size_t JsonString::parse(const std::string& jsonStr, size_t begin, size_t end) {
     str_ = parseQuoted(jsonStr, begin);
     if (!valid_ || begin >= end) return invalid();
-    return valid_ ? begin : -1;
+    return valid_ ? begin : std::string::npos;
 }
 
-int JsonNumber::parse(const std::string& jsonStr, size_t begin, size_t end) {
+bool JsonNumber::isMathSign(const std::string& jsonStr, size_t idx) {
+    return std::find(std::begin(mathChars), std::end(mathChars), 
+        jsonStr[idx]) != std::end(mathChars);
+}
+
+size_t JsonNumber::parse(const std::string& jsonStr, size_t begin, size_t end) {
     size_t idx = begin;
     end = std::min(jsonStr.size(), end);
     while (idx < end && skippable(jsonStr, idx)) {
         idx++;
     }
     size_t numBegin = idx;
-    while (idx < end && (!skippable(jsonStr, idx) || jsonStr[idx] == ',')) {
+    while (idx < end && ((jsonStr[idx]-'0' >= 0 && jsonStr[idx]-'0' < 10) || isMathSign(jsonStr, idx))) {
         idx++;
     }
+    if (idx <= numBegin) return invalid();
     jsonNumber_ = std::stod(jsonStr.substr(numBegin, idx-numBegin));
-    return valid_ ? idx : -1;
+    return valid_ ? idx : std::string::npos;
 }
 
 } // namespace elasticJeans

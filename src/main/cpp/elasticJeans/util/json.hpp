@@ -27,7 +27,7 @@ public:
 
     JsonBase& operator=(const std::string& attr);
 
-    virtual int parse(const std::string& jsonStr, size_t begin = 0, size_t end = std::string::npos);
+    virtual size_t parse(const std::string& jsonStr, size_t begin = 0, size_t end = std::string::npos);
 
     bool valid() { return valid_; }
 
@@ -42,7 +42,7 @@ public:
         return rtn;
     }
 
-    virtual std::string toString() { return ""; }
+    virtual std::string toString(bool compact = true, int indent = 0) { return ""; }
 
 protected:
     bool valid_ = true;
@@ -55,15 +55,21 @@ protected:
     bool isArray_ = false;
 
     static const char skippableChars[4];
+    static const char openningChars[3];
+    static const char closingChars[3];
 
-    int invalid() {
+    size_t invalid() {
         valid_ = false;
-        return -1;
+        return std::string::npos;
     }
 
     std::string parseQuoted(const std::string& jsonStr, size_t& from);
 
     bool skippable(const std::string& jsonStr, size_t idx);
+
+    bool isOpening(const std::string& jsonStr, size_t idx);
+
+    bool isClosing(const std::string& jsonStr, size_t idx);
 };
 
 class JsonObject : public JsonBase {
@@ -74,22 +80,9 @@ public:
 
     JsonBase& operator[](const std::string& attr) override;
 
-    int parse(const std::string& jsonStr, size_t begin = 0, size_t end = std::string::npos) override;
+    size_t parse(const std::string& jsonStr, size_t begin = 0, size_t end = std::string::npos) override;
 
-    std::string toString() override {
-        std::ostringstream osstream;
-        osstream << '{' << '\n';
-        for (auto it = std::begin(jsonObject_); it != std::end(jsonObject_); it++) {
-            auto& [k, val] = *it;
-            osstream << "    \"" << k << "\":" << val->toString();
-            if (std::next(it) != std::end(jsonObject_)) {
-                osstream << ",";
-            }
-            osstream << "\n";
-        }
-        osstream << '}' << '\n';
-        return osstream.str();
-    }
+    std::string toString(bool compact = true, int indent = 0) override;
 
 private:
     std::unordered_map<std::string, jsonPtr> jsonObject_;
@@ -98,21 +91,10 @@ private:
 
 class JsonArray : public JsonBase {
 public:
-    int parse(const std::string& jsonStr, size_t begin = 0, size_t end = std::string::npos) override;
+    size_t parse(const std::string& jsonStr, size_t begin = 0, size_t end = std::string::npos) override;
 
-    std::string toString() override {
-        std::ostringstream osstream;
-        osstream << '[';
-        for (auto it = std::begin(jsonArray_); it != std::end(jsonArray_); it++) {
-            auto ptr = *it;
-            osstream << ptr->toString();
-            if (std::next(it) != std::end(jsonArray_)) {
-                osstream << ",";
-            }
-        }
-        osstream << ']';
-        return osstream.str();
-    }
+    std::string toString(bool compact = true, int indent = 0) override;
+    
 private:
     std::vector<jsonPtr> jsonArray_;
 
@@ -120,21 +102,24 @@ private:
 
 class JsonString : public JsonBase {
 public:
-    int parse(const std::string& jsonStr, size_t begin = 0, size_t end = std::string::npos) override;
+    size_t parse(const std::string& jsonStr, size_t begin = 0, size_t end = std::string::npos) override;
 
-    std::string toString() { return "\"" + str_ + "\""; }
+    std::string toString(bool compact = true, int indent = 0) override { return "\"" + str_ + "\""; }
 private:
     std::string str_;
 };
 
 class JsonNumber : public JsonBase {
+    static const char mathChars[5];
 public:
-    int parse(const std::string& jsonStr, size_t begin = 0, size_t end = std::string::npos) override;
+    size_t parse(const std::string& jsonStr, size_t begin = 0, size_t end = std::string::npos) override;
 
-    std::string toString() { return std::to_string(jsonNumber_); }
+    std::string toString(bool compact = true, int indent = 0) override { return std::to_string(jsonNumber_); }
 
 private:
     double jsonNumber_;
+
+    bool isMathSign(const std::string& jsonStr, size_t idx);
 };
 
 
@@ -143,7 +128,7 @@ class JsonBoolean : public JsonBase {
 public:
     JsonBoolean(bool jsonBool) : JsonBase(), jsonBoolean_(jsonBool) {}
 
-    std::string toString() override { return jsonBoolean_ ? "true" : "false"; }
+    std::string toString(bool compact = true, int indent = 0) override { return jsonBoolean_ ? "true" : "false"; }
 
 private:
     bool jsonBoolean_;
@@ -151,7 +136,7 @@ private:
 
 class JsonVoid : public JsonBase {
 public:
-    std::string toString() override { return "null"; }
+    std::string toString(bool compact = true, int indent = 0) override { return "null"; }
 };
 
 template<typename T>
