@@ -34,7 +34,7 @@ public:
 
     virtual JsonBase& operator[](const std::string& attr);
 
-    virtual JsonBase& operator[](int idx);
+    virtual JsonBase& operator[](size_t idx);
 
     JsonBase& operator=(const std::string& attr);
 
@@ -42,11 +42,22 @@ public:
 
     bool valid() { return valid_; }
 
-    std::optional<jsonPtr> at(const std::string& attr);
+    virtual std::optional<jsonPtr> at(const std::string& attr);
+
+    virtual std::optional<jsonPtr> at(size_t idx);
 
     template<typename... Args>
     std::optional<jsonPtr> at(const std::string& attr, Args... args) {
         auto rtn = this->at(attr);
+        if (rtn.has_value()) {
+            return rtn->get()->at(args...);
+        }
+        return rtn;
+    }
+
+    template<typename... Args>
+    std::optional<jsonPtr> at(int idx, Args... args) {
+        auto rtn = this->at(idx);
         if (rtn.has_value()) {
             return rtn->get()->at(args...);
         }
@@ -104,6 +115,8 @@ public:
 
     JsonBase& operator[](const std::string& attr) override;
 
+    std::optional<jsonPtr> at(const std::string& attr) override;
+
     size_t parse(const std::string& jsonStr, size_t begin = 0, size_t end = std::string::npos) override;
 
     std::string toString(bool compact = true, int indent = 0) override;
@@ -111,6 +124,11 @@ public:
     std::string jsonize(bool compact = true, int indent = 0) override;
 
     std::string serialize(bool compact = true, int indent = 0, bool convertJson = false) override;
+
+    template<typename T>
+    void add(const std::string& attr, T value) {
+        jsonObject_[attr] = std::make_shared<T>(value);
+    }
 
 private:
     std::unordered_map<std::string, jsonPtr> jsonObject_;
@@ -124,11 +142,18 @@ public:
         element_ = JsonElement::Array;
     }
 
+    JsonBase& operator[](size_t idx) override;
+
+    std::optional<jsonPtr> at(size_t idx) override;
+
     size_t parse(const std::string& jsonStr, size_t begin = 0, size_t end = std::string::npos) override;
 
-    JsonBase& operator[](int idx) override;
-
     std::string serialize(bool compact = true, int indent = 0, bool convertJson = true) override;
+
+    template<typename T>
+    void append(T value) {
+        jsonArray_.push_back(std::make_shared<T>(value));
+    }
 
 private:
     std::vector<jsonPtr> jsonArray_;
@@ -141,6 +166,9 @@ public:
         isString_ = true;
         element_ = JsonElement::String;
     }
+
+    JsonString(const std::string& str) : JsonString() { this->str_ = str; }
+
     size_t parse(const std::string& jsonStr, size_t begin = 0, size_t end = std::string::npos) override;
 
     std::string toString(bool compact = true, int indent = 0) override { return serialize(compact, indent, false); }
@@ -161,6 +189,7 @@ class JsonNumber : public JsonBase {
 public:
     JsonNumber() : JsonBase() {
         isNumeric_ = true;
+        isDouble_ = true;
         element_ = JsonElement::Number;
     }
 

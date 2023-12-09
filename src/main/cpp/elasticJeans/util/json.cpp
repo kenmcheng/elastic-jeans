@@ -13,13 +13,21 @@ JsonBase& JsonBase::operator[](const std::string& attr) {
     return *this;
 }
 
-JsonBase& JsonBase::operator[](int idx) {
+JsonBase& JsonBase::operator[](size_t idx) {
     return *this;
 }
 
 JsonBase& JsonBase::operator=(const std::string& value) {
     this->parse(value);
     return *this;
+}
+
+std::optional<JsonBase::jsonPtr> JsonBase::at(const std::string& attr) {
+    return std::nullopt;
+}
+
+std::optional<JsonBase::jsonPtr> JsonBase::at(size_t idx) {
+    return std::nullopt;
 }
 
 size_t JsonBase::parse(const std::string& jsonStr, size_t begin, size_t end) {
@@ -174,7 +182,12 @@ JsonBase& JsonObject::operator[](const std::string& attr) {
     // if (!entityExist()) {
     //     jsonObject_ = std::make_unique<std::unordered_map<std::string, jsonPtr>>();
     // }
-    return *(jsonObject_.at(attr));
+    return *(jsonObject_[attr]);
+}
+
+std::optional<JsonBase::jsonPtr> JsonObject::at(const std::string& attr) {
+    if (!jsonObject_.count(attr)) return std::nullopt;
+    return jsonObject_[attr];
 }
 
 size_t JsonObject::parse(const std::string& jsonStr, size_t begin, size_t end) {
@@ -307,7 +320,7 @@ std::string JsonObject::serialize(bool compact, int indent, bool convertJson) {
         for (int i = 0; i < indent; i++) indentation += "    ";
     
     osstream << '{';
-    if (!compact) osstream << '\n';
+    if (!compact) osstream << "\r\n";
     for (auto it = std::begin(jsonObject_); it != std::end(jsonObject_); it++) {
         auto& [k, val] = *it;
         if (!compact)
@@ -317,11 +330,23 @@ std::string JsonObject::serialize(bool compact, int indent, bool convertJson) {
         if (std::next(it) != std::end(jsonObject_)) {
             osstream << ",";
         }
-        if (!compact) osstream << "\n";
+        if (!compact) osstream << "\r\n";
     }
     if (!compact) osstream << indentation;
     osstream << '}';
     return osstream.str();
+}
+
+JsonBase& JsonArray::operator[](size_t idx) {
+    if (idx >= jsonArray_.size()) {
+        return *this;
+    }
+    return *(jsonArray_.at(idx));
+}
+
+std::optional<JsonBase::jsonPtr> JsonArray::at(size_t idx) {
+    if (idx >= jsonArray_.size()) return std::nullopt;
+    return jsonArray_.at(idx);
 }
 
 size_t JsonArray::parse(const std::string& jsonStr, size_t begin, size_t end) {
@@ -421,23 +446,25 @@ size_t JsonArray::parse(const std::string& jsonStr, size_t begin, size_t end) {
     return valid_ ? idx+1 : std::string::npos;
 }
 
-JsonBase& JsonArray::operator[](int idx) {
-    if (idx < 0 || idx >= jsonArray_.size()) {
-        return *this;
-    }
-    return *jsonArray_[idx];
-}
-
 std::string JsonArray::serialize(bool compact, int indent, bool convertJson) {
     std::ostringstream osstream;
+    std::string indentation = "";
+    if (!compact)
+        for (int i = 0; i < indent; i++) indentation += "    ";
+
     osstream << '[';
+    if (!compact) osstream << "\r\n";
     for (auto it = std::begin(jsonArray_); it != std::end(jsonArray_); it++) {
         auto ptr = *it;
-        osstream << ptr->serialize(true, indent, convertJson);
+        if (!compact) osstream << indentation << "    ";
+        osstream << ptr->serialize(compact, indent+1, convertJson);
         if (std::next(it) != std::end(jsonArray_)) {
             osstream << ",";
+            
         }
+        if (!compact) osstream << "\r\n";
     }
+    if (!compact) osstream << indentation;
     osstream << ']';
     return osstream.str();
 }
