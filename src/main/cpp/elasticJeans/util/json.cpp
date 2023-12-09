@@ -4,12 +4,16 @@
 
 namespace elasticJeans {
 
-const char JsonBase::skippableChars[4] {' ', '\n', '\r', '\t'};
+const char JsonBase::whitespaces[4] {' ', '\n', '\r', '\t'};
 const char JsonBase::openningChars[3] {'{', '[', '"'};
 const char JsonBase::closingChars[3] {'}', ']', '"'};
 const char JsonNumber::mathChars[5] {'+', '-', '.', 'E', 'e'};
 
 JsonBase& JsonBase::operator[](const std::string& attr) {
+    return *this;
+}
+
+JsonBase& JsonBase::operator[](int idx) {
     return *this;
 }
 
@@ -23,8 +27,8 @@ size_t JsonBase::parse(const std::string& jsonStr, size_t begin, size_t end) {
 }
 
 bool JsonBase::skippable(const std::string& jsonStr, size_t idx) {
-    return std::find(std::begin(skippableChars), std::end(skippableChars), 
-            jsonStr[idx]) != std::end(skippableChars);
+    return std::find(std::begin(whitespaces), std::end(whitespaces), 
+            jsonStr[idx]) != std::end(whitespaces);
 }
 
 bool JsonBase::isOpening(const std::string& jsonStr, size_t idx) {
@@ -68,9 +72,95 @@ std::string JsonBase::parseQuoted(const std::string& jsonStr, size_t& from) {
         from = invalid();
         return "";
     }
-    std::string rtn = jsonStr.substr(attrBegin+1, idx-attrBegin-1);
+    std::string subJsonStr = jsonStr.substr(attrBegin+1, idx-attrBegin-1);
     from = idx+1;
-    return rtn;
+    return processString(subJsonStr, true);
+}
+
+std::string JsonBase::processString(const std::string& str, bool convertEscape) {
+    if (!convertEscape) return str;
+
+    // std::string newStr(str);
+    // newStr.erase(std::remove(newStr.begin(), newStr.end(), '\\'), str.end());
+    // return newStr;
+    std::ostringstream osstream;
+    bool escape = false;
+    for (char c : str) {
+        if (!escape) {
+            if (c == '\\') {
+                escape = true;
+            } else osstream << c;
+            continue;
+        }
+        switch (c) {
+        case '"':
+        case '\\':
+        case '/':
+            osstream << c;
+            break;
+        case 'b':
+            osstream << ' ';
+            break;
+        case 'f':
+            osstream << '\f';
+            break;
+        case 'n':
+            osstream << '\n';
+            break;
+        case 'r':
+            osstream << '\r';
+            break;
+        case 't':
+            osstream << '\t';
+            break;
+        case 'u':
+            osstream << "\\u";
+        default:
+            break;
+        }
+        escape = false;
+    }
+    return osstream.str();
+}
+
+
+std::string JsonBase::jsonizeString(const std::string& str) {
+    std::ostringstream osstream;
+    for (char c : str) {
+        // if (!escape) {
+        //     if (c == '\\') {
+        //         escape = true;
+        //     } else osstream << c;
+        //     continue;
+        // }
+        switch (c) {
+        case '"':
+        // case '\\':
+        case '/':
+            osstream << '\\' << c;
+            break;
+        case '\b':
+            osstream << "\\b";
+            break;
+        case '\f':
+            osstream << "\\f";
+            break;
+        case '\n':
+            osstream << "\\n";
+            break;
+        case '\r':
+            osstream << "\\r";
+            break;
+        case '\t':
+            osstream << "\\t";
+            break;
+
+        default:
+            osstream << c;
+            break;
+        }
+    }
+    return osstream.str();
 }
 
 // std::optional<JsonBase::jsonPtr> JsonBase::at(const std::string& attr) {
@@ -202,6 +292,14 @@ size_t JsonObject::parse(const std::string& jsonStr, size_t begin, size_t end) {
 }
 
 std::string JsonObject::toString(bool compact, int indent) {
+    return serialize(compact, indent, false);
+}
+
+std::string JsonObject::jsonize(bool compact, int indent) {
+    return serialize(compact, indent, true);
+}
+
+std::string JsonObject::serialize(bool compact, int indent, bool convertJson) {
     std::ostringstream osstream;
     std::string indentation = "";
     std::string colon = compact ? ":" : ": ";
@@ -215,7 +313,7 @@ std::string JsonObject::toString(bool compact, int indent) {
         if (!compact)
             osstream << indentation << "    ";
             
-        osstream << "\"" << k << "\"" << colon << val->toString(compact, indent+1);
+        osstream << "\"" << (convertJson ? jsonizeString(k) : k) << "\"" << colon << val->serialize(compact, indent+1, convertJson);
         if (std::next(it) != std::end(jsonObject_)) {
             osstream << ",";
         }
@@ -323,12 +421,19 @@ size_t JsonArray::parse(const std::string& jsonStr, size_t begin, size_t end) {
     return valid_ ? idx+1 : std::string::npos;
 }
 
-std::string JsonArray::toString(bool compact, int indent) {
+JsonBase& JsonArray::operator[](int idx) {
+    if (idx < 0 || idx >= jsonArray_.size()) {
+        return *this;
+    }
+    return *jsonArray_[idx];
+}
+
+std::string JsonArray::serialize(bool compact, int indent, bool convertJson) {
     std::ostringstream osstream;
     osstream << '[';
     for (auto it = std::begin(jsonArray_); it != std::end(jsonArray_); it++) {
         auto ptr = *it;
-        osstream << ptr->toString();
+        osstream << ptr->serialize(true, indent, convertJson);
         if (std::next(it) != std::end(jsonArray_)) {
             osstream << ",";
         }

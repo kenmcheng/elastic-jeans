@@ -13,6 +13,15 @@
 
 namespace elasticJeans {
 
+enum class JsonElement {
+    Base,
+    Object,
+    Array,
+    String,
+    Number,
+    Boolean,
+    Void
+};
 
 class JsonBase {
     
@@ -24,6 +33,8 @@ public:
     JsonBase(const std::string& jsonStr) { this->parse(jsonStr); }
 
     virtual JsonBase& operator[](const std::string& attr);
+
+    virtual JsonBase& operator[](int idx);
 
     JsonBase& operator=(const std::string& attr);
 
@@ -42,19 +53,25 @@ public:
         return rtn;
     }
 
-    virtual std::string toString(bool compact = true, int indent = 0) { return ""; }
+    virtual std::string toString(bool compact = true, int indent = 0) { return serialize(compact, indent, false); }
 
+    virtual std::string jsonize(bool compact = true, int indent = 0) { return serialize(compact, indent, true); }
+
+    virtual std::string serialize(bool compact = true, int indent = 0, bool convertJson = false) { return ""; }
 protected:
     bool valid_ = true;
     bool isObject_ = false;
+    bool isArray_ = false;
     bool isString_ = false;
     bool isBoolean_ = false;
     bool isNumeric_ = false;
     bool isInteger_ = false;
     bool isDouble_ = false;
-    bool isArray_ = false;
+    bool isNull_ = false;
 
-    static const char skippableChars[4];
+    JsonElement element_ = JsonElement::Base;
+
+    static const char whitespaces[4];
     static const char openningChars[3];
     static const char closingChars[3];
 
@@ -65,6 +82,10 @@ protected:
 
     std::string parseQuoted(const std::string& jsonStr, size_t& from);
 
+    std::string processString(const std::string& str, bool convertEscape);
+
+    std::string jsonizeString(const std::string& str);
+
     bool skippable(const std::string& jsonStr, size_t idx);
 
     bool isOpening(const std::string& jsonStr, size_t idx);
@@ -74,15 +95,22 @@ protected:
 
 class JsonObject : public JsonBase {
 public:
-    JsonObject() = default;
+    JsonObject() : JsonBase() {
+        isObject_ = true;
+        element_ = JsonElement::Object;
+    }
 
-    JsonObject(const std::string& jsonStr) : JsonBase() { this->parse(jsonStr); }
+    JsonObject(const std::string& jsonStr) : JsonObject() { this->parse(jsonStr); }
 
     JsonBase& operator[](const std::string& attr) override;
 
     size_t parse(const std::string& jsonStr, size_t begin = 0, size_t end = std::string::npos) override;
 
     std::string toString(bool compact = true, int indent = 0) override;
+
+    std::string jsonize(bool compact = true, int indent = 0) override;
+
+    std::string serialize(bool compact = true, int indent = 0, bool convertJson = false) override;
 
 private:
     std::unordered_map<std::string, jsonPtr> jsonObject_;
@@ -91,10 +119,17 @@ private:
 
 class JsonArray : public JsonBase {
 public:
+    JsonArray() : JsonBase() {
+        isArray_ = true;
+        element_ = JsonElement::Array;
+    }
+
     size_t parse(const std::string& jsonStr, size_t begin = 0, size_t end = std::string::npos) override;
 
-    std::string toString(bool compact = true, int indent = 0) override;
-    
+    JsonBase& operator[](int idx) override;
+
+    std::string serialize(bool compact = true, int indent = 0, bool convertJson = true) override;
+
 private:
     std::vector<jsonPtr> jsonArray_;
 
@@ -102,19 +137,36 @@ private:
 
 class JsonString : public JsonBase {
 public:
+    JsonString() : JsonBase() {
+        isString_ = true;
+        element_ = JsonElement::String;
+    }
     size_t parse(const std::string& jsonStr, size_t begin = 0, size_t end = std::string::npos) override;
 
-    std::string toString(bool compact = true, int indent = 0) override { return "\"" + str_ + "\""; }
+    std::string toString(bool compact = true, int indent = 0) override { return serialize(compact, indent, false); }
+
+    std::string jsonize(bool compact = true, int indent = 0) override { return serialize(compact, indent, true); }
+
+    std::string serialize(bool compact = true, int indent = 0, bool convertJson = true) override {
+        return convertJson ? "\"" + jsonizeString(str_) + "\"" : "\"" + str_ + "\"";
+    }
+
 private:
     std::string str_;
+
 };
 
 class JsonNumber : public JsonBase {
     static const char mathChars[5];
 public:
+    JsonNumber() : JsonBase() {
+        isNumeric_ = true;
+        element_ = JsonElement::Number;
+    }
+
     size_t parse(const std::string& jsonStr, size_t begin = 0, size_t end = std::string::npos) override;
 
-    std::string toString(bool compact = true, int indent = 0) override { return std::to_string(jsonNumber_); }
+    std::string serialize(bool compact = true, int indent = 0, bool convertJson = true) override { return std::to_string(jsonNumber_); }
 
 private:
     double jsonNumber_;
@@ -126,9 +178,14 @@ private:
 
 class JsonBoolean : public JsonBase {
 public:
-    JsonBoolean(bool jsonBool) : JsonBase(), jsonBoolean_(jsonBool) {}
+    JsonBoolean() : JsonBoolean(false) {}
 
-    std::string toString(bool compact = true, int indent = 0) override { return jsonBoolean_ ? "true" : "false"; }
+    JsonBoolean(bool jsonBool) : JsonBase(), jsonBoolean_(jsonBool) {
+        isBoolean_ = true;
+        element_ = JsonElement::Boolean;
+    }
+
+    std::string serialize(bool compact = true, int indent = 0, bool convertJson = true) override { return jsonBoolean_ ? "true" : "false"; }
 
 private:
     bool jsonBoolean_;
@@ -136,7 +193,12 @@ private:
 
 class JsonVoid : public JsonBase {
 public:
-    std::string toString(bool compact = true, int indent = 0) override { return "null"; }
+    JsonVoid() : JsonBase() {
+        isNull_ = true;
+        element_ = JsonElement::Void;
+    }
+
+    std::string serialize(bool compact = true, int indent = 0, bool convertJson = true) override { return "null"; }
 };
 
 template<typename T>

@@ -4,6 +4,11 @@
 namespace elasticJeans {
 namespace http {
 
+Header& Header::operator=(std::string value) {
+    this->values_.push_back(std::move(value));
+    return *this;
+}
+
 Header& HeaderList::operator[](const std::string& headerName) {
     return this->get(headerName);
 }

@@ -15,10 +15,7 @@ public:
 
     std::string& operator[](size_t idx) { return values_[idx]; }
 
-    Header& operator=(std::string value) {
-        this->values_.push_back(std::move(value));
-        return *this;
-    }
+    Header& operator=(std::string value);
 
     size_t size() { return values_.size(); }
 
