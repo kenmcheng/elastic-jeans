@@ -7,12 +7,12 @@ HTTP web application written in C++
 - Linux
 ### Prerequisites
 The following tools have to be installed in your linux environment
+- gcc/g++ 13
 - C++20 STL
 - cmake (version 3.22 or later)
 - make (version 4.3 or later)
 #### Libraries
 - OpenSSL ([GitHub](https://github.com/openssl/openssl))
-- ODBC ([GitHub](https://github.com/r-dbi/odbc))
 
 ### Command
 ```
