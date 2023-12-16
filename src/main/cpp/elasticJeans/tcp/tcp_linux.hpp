@@ -1,7 +1,7 @@
 #ifndef _ELASTICJEANS_TCP_LINUX_H
 #define _ELASTICJEANS_TCP_LINUX_H
 
-#include "tcp_worker.hpp"
+#include <elasticJeans/tcp/tcp_worker.hpp>
 
 #include <string>
 #include <sys/socket.h>

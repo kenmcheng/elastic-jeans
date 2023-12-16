@@ -13,7 +13,8 @@ file(GLOB HDRS src/main/cpp/elasticJeans/**/*.hpp src/main/cpp/elasticJeans/*.hp
 file(GLOB SRCS src/main/cpp/elasticJeans/**/*.cpp src/main/cpp/elasticJeans/*.cpp)
 
 add_library(${EJ_LIB} STATIC ${HDRS} ${SRCS})
-target_include_directories(${EJ_LIB} PUBLIC src/main/cpp/elasticJeans)
+target_include_directories(${EJ_LIB} PUBLIC src/main/cpp)
+target_include_directories(${EJ_LIB} PUBLIC src/inc)
 target_include_directories(${EJ_LIB} PUBLIC libs)
 
 set_target_properties(${EJ_LIB}

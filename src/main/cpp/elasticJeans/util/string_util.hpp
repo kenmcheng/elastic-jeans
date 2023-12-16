@@ -1,6 +1,6 @@
 #ifndef _ELASTICJEANS_STRING_UTIL_H
 #define _ELASTICJEANS_STRING_UTIL_H
-#include <log/log.hpp>
+#include <elasticJeans/log/log.hpp>
 
 #include <vector>
 #include <string>

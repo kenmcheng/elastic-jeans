@@ -1,7 +1,7 @@
 #ifndef _ELASTICJEANS_HTTP_REQUEST_H
 #define _ELASTICJEANS_HTTP_REQUEST_H
 
-#include "http_header.hpp"
+#include <elasticJeans/http/http_header.hpp>
 
 #include <algorithm> 
 #include <string>

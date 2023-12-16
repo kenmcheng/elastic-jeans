@@ -1,7 +1,7 @@
 #ifndef _ELASTICJEANS_JSON_H
 #define _ELASTICJEANS_JSON_H
 
-#include "serializable.hpp"
+#include <elasticJeans/util/serializable.hpp>
 
 #include <string>
 #include <memory>
@@ -29,6 +29,8 @@ public:
     using jsonPtr = std::shared_ptr<JsonBase>;
 
     JsonBase() = default;
+
+    virtual ~JsonBase() {};
 
     JsonBase(const std::string& jsonStr) { this->parse(jsonStr); }
 
@@ -187,7 +189,9 @@ private:
 class JsonNumber : public JsonBase {
     static const char mathChars[5];
 public:
-    JsonNumber() : JsonBase() {
+    JsonNumber() : JsonNumber(0) {}
+
+    JsonNumber(double number) : JsonBase(), jsonNumber_(number) {
         isNumeric_ = true;
         isDouble_ = true;
         element_ = JsonElement::Number;

@@ -1,6 +1,6 @@
-#include "http_request.hpp"
-#include <util/string_util.hpp>
-#include <log/log.hpp>
+#include <elasticJeans/http/http_request.hpp>
+#include <elasticJeans/util/string_util.hpp>
+#include <elasticJeans/log/log.hpp>
 
 #include <string>
 #include <vector>

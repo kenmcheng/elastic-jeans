@@ -1,5 +1,5 @@
 #include "task_queue.hpp"
-#include <log/log.hpp>
+#include <elasticJeans/log/log.hpp>
 
 
 namespace elasticJeans {

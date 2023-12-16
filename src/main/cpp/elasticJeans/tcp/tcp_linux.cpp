@@ -1,6 +1,6 @@
-#include "tcp_linux.hpp"
-#include <log/log.hpp>
-#include <http/http_header.hpp>
+#include <elasticJeans/tcp/tcp_linux.hpp>
+#include <elasticJeans/log/log.hpp>
+#include <elasticJeans/http/http_header.hpp>
 
 #include <iostream>
 #include <sstream>

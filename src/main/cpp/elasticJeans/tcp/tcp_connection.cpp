@@ -1,5 +1,5 @@
-#include "tcp_connection.hpp"
-#include <log/log.hpp>
+#include <elasticJeans/tcp/tcp_connection.hpp>
+#include <elasticJeans/log/log.hpp>
 
 #include <sstream>
 #include <unistd.h>

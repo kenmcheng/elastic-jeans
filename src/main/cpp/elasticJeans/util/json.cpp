@@ -1,4 +1,4 @@
-#include "json.hpp"
+#include <elasticJeans/util/json.hpp>
 
 #include <iostream>
 
@@ -182,7 +182,7 @@ JsonBase& JsonObject::operator[](const std::string& attr) {
     // if (!entityExist()) {
     //     jsonObject_ = std::make_unique<std::unordered_map<std::string, jsonPtr>>();
     // }
-    return *(jsonObject_[attr]);
+    return *(jsonObject_.at(attr));
 }
 
 std::optional<JsonBase::jsonPtr> JsonObject::at(const std::string& attr) {

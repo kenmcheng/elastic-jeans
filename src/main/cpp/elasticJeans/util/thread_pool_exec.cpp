@@ -1,5 +1,5 @@
-#include "thread_pool_exec.hpp"
-#include <log/log.hpp>
+#include <elasticJeans/util/thread_pool_exec.hpp>
+#include <elasticJeans/log/log.hpp>
 
 
 namespace elasticJeans {

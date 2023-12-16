@@ -1,14 +1,14 @@
 #ifndef _ELASTICJEANS_HTTP_LINUX_H
 #define _ELASTICJEANS_HTTP_LINUX_H
 
-#include <tcp/tcp_linux.hpp>
-#include <tcp/tcp_connection.hpp>
-#include "http_request.hpp"
-#include "http_response.hpp"
+#include <elasticJeans/tcp/tcp_linux.hpp>
+#include <elasticJeans/tcp/tcp_connection.hpp>
+// #include <elasticJeans/http/http_request.hpp>
+// #include <elasticJeans/http/http_response.hpp>
 
-#include <restful/rest_api_registry.hpp>
+#include <elasticJeans/restful/rest_api_registry.hpp>
 
-#include <memory>
+// #include <memory>
 #include <string>
 #include <iostream>
 #include <csignal>

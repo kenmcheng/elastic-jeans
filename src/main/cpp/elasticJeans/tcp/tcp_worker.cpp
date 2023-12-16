@@ -1,6 +1,6 @@
-#include "tcp_worker.hpp"
-#include "tcp_linux.hpp"
-#include <log/log.hpp>
+#include <elasticJeans/tcp/tcp_worker.hpp>
+#include <elasticJeans/tcp/tcp_linux.hpp>
+#include <elasticJeans/log/log.hpp>
 
 #include <sstream>
 #include <unistd.h>

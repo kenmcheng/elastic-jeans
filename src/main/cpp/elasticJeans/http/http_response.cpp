@@ -1,4 +1,4 @@
-#include "http_response.hpp"
+#include <elasticJeans/http/http_response.hpp>
 
 #include <sstream>
 #include <time.h>

@@ -1,4 +1,4 @@
-#include "log.hpp"
+#include <elasticJeans/log/log.hpp>
 #include <iostream>
 
 namespace elasticJeans {

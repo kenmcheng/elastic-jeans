@@ -1,8 +1,9 @@
-#include "http_linux.hpp"
-#include <log/log.hpp>
-#include "http_header.hpp"
+#include <elasticJeans/http/http_linux.hpp>
+#include <elasticJeans/http/http_thread_local.hpp>
+#include <elasticJeans/log/log.hpp>
+#include <elasticJeans/http/http_header.hpp>
 
-#include <tls/handshaker.hpp>
+#include <elasticJeans/tls/handshaker.hpp>
 
 #include <time.h>
 

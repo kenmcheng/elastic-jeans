@@ -1,7 +1,7 @@
 #ifndef _ELASTICJEANS_REST_API_REGISTRY_H
 #define _ELASTICJEANS_REST_API_REGISTRY_H
 
-#include "rest.hpp"
+#include <elasticJeans/restful/rest.hpp>
 
 #include <memory>
 #include <optional>

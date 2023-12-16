@@ -1,19 +1,15 @@
 #ifndef _ELASTICJEANS_APPLICATION_H
 #define _ELASTICJEANS_APPLICATION_H
 
-#include <http/http_linux.hpp>
-#include <restful/rest.hpp>
-
+#include <string>
 #include <vector>
-#include <csignal>
-#include <memory>
 
-using elasticJeans::http::Method;
+// using elasticJeans::http::Method;
 
 namespace elasticJeans {
 
 class App {
-    std::vector<std::unique_ptr<http::HttpServer>> serverPtrs_;
+    // std::vector<std::unique_ptr<http::HttpServer>> serverPtrs_;
 public:
     class Initiator {
     public:
@@ -26,14 +22,16 @@ public:
         void start();
     };
 
+    virtual ~App() {}
+
     static Initiator init() { return Initiator(); }
 
 private:
-    void start();
+    virtual void start() = 0;
 
-    App& http(const std::string& ip, int port);
+    virtual App& http(const std::string& ip, int port) = 0;
 
-    App& https(const std::string& ip, int port);
+    virtual App& https(const std::string& ip, int port) = 0;
 
 };
 
@@ -42,19 +40,9 @@ private:
 
 void sigFunc(int signal);
 
-inline App::Initiator app() {
-    std::signal(SIGINT, sigFunc);
-    return App::init();
-}
+App::Initiator app();
 
-inline App::Initiator app(const std::string& ip, int port, bool withTLS = false) {
-    App::Initiator newApp = app();
-    if (withTLS)
-        newApp.https(ip, port);
-    else
-        newApp.http(ip, port);
-    return newApp;
-}
+App::Initiator app(const std::string& ip, int port, bool withTLS = false);
 
 // inline void start() {
 //     serverPtr->start();

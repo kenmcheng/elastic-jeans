@@ -1,4 +1,4 @@
-#include "rest_api_registry.hpp"
+#include <elasticJeans/restful/rest_api_registry.hpp>
 
 namespace elasticJeans {
 

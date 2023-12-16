@@ -1,7 +1,7 @@
 #ifndef _ELASTICJEANS_TCP_WORKER_H
 #define _ELASTICJEANS_TCP_WORKER_H
-#include "tcp_connection.hpp"
-#include <util/thread_pool_exec.hpp>
+#include <elasticJeans/tcp/tcp_connection.hpp>
+#include <elasticJeans/util/thread_pool_exec.hpp>
 
 #include <queue>
 #include <memory>

@@ -1,9 +1,9 @@
 #ifndef _ELASTICJEANS_REST_H
 #define _ELASTICJEANS_REST_H
 
-#include <http/http_request.hpp>
-#include <http/http_response.hpp>
-#include <util/serializable.hpp>
+#include <elasticJeans/http/http_request.hpp>
+#include <elasticJeans/http/http_response.hpp>
+#include <elasticJeans/util/serializable.hpp>
 
 #include <functional>
 #include <cstdarg>
@@ -35,6 +35,7 @@ struct Fn_type<R(C::*)(Args...) const,
 class RestBaseAPI {
 public:
     // RestBaseAPI() {}
+    virtual ~RestBaseAPI() {}
 
     RestBaseAPI(const http::Method::MethodEnum& method, const std::string& path) :
         method_(method),
