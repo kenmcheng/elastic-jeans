@@ -4,12 +4,10 @@
 #include <string>
 #include <vector>
 
-// using elasticJeans::http::Method;
-
 namespace elasticJeans {
 
 class App {
-    // std::vector<std::unique_ptr<http::HttpServer>> serverPtrs_;
+
 public:
     class Initiator {
     public:
@@ -35,19 +33,11 @@ private:
 
 };
 
-// extern std::unique_ptr<http::HttpServer> serverPtr;
-// extern std::unique_ptr<App> appPtr;
-
 void sigFunc(int signal);
 
 App::Initiator app();
 
 App::Initiator app(const std::string& ip, int port, bool withTLS = false);
-
-// inline void start() {
-//     serverPtr->start();
-// }
-
 
 } // namespace elasticJeans
 

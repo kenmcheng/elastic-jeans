@@ -3,6 +3,8 @@ Elastic Jeans
 HTTP web application written in C++
 
 ## Build
+### Supported OS
+- Linux
 ### Prerequisites
 The following tools have to be installed in your linux environment
 - C++20 STL
@@ -10,6 +12,7 @@ The following tools have to be installed in your linux environment
 - make (version 4.3 or later)
 #### Libraries
 - OpenSSL ([GitHub](https://github.com/openssl/openssl))
+- ODBC ([GitHub](https://github.com/r-dbi/odbc))
 
 ### Command
 ```
