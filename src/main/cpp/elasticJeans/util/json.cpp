@@ -1,6 +1,7 @@
 #include <elasticJeans/util/json.hpp>
 
 #include <iostream>
+#include <algorithm>
 
 namespace elasticJeans {
 

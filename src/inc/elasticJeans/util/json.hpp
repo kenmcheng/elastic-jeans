@@ -248,7 +248,6 @@ private:
 };
 
 
-
 } // namespace elasticJeans
 
 #endif // _ELASTICJEANS_JSON_H
