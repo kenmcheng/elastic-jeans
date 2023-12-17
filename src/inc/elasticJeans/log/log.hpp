@@ -32,20 +32,35 @@ public:
     template<typename... Args>
     static void log(int severity, const std::string& f, Args&&... args) {
         if (severity < logLevel_) return;
-        char buf[1000];
-        time_t now = time(0);
-        struct tm tm = *gmtime(&now);
-        static const char* dateFormat = "%Y-%m-%d %H:%M:%S";
-        int milli = now % 1000;
-        strftime(buf, sizeof buf, dateFormat, &tm);
+        try {
+            char buf[1000];
+            time_t now = time(0);
+            struct tm tm = *gmtime(&now);
+            static const char* dateFormat = "%Y-%m-%d %H:%M:%S";
+            int milli = now % 1000;
+            strftime(buf, sizeof buf, dateFormat, &tm);
 
-        std::cout << buf << "." << std::setfill('0') << std::setw(3) << milli;
-        if (severity > 0 && severity < NUM_OF_SERVERITIES) {
-            std::cout << " [" << severities[severity] << "] ";
-        } else std::cout << " ";
-        std::cout << std::vformat(f, std::make_format_args(std::forward<Args>(args)...));
-        // log(args...);
-        std::cout << std::endl;
+            std::ostringstream osstream;
+
+            osstream << buf << "." << std::setfill('0') << std::setw(3) << milli;
+            if (severity > 0 && severity < NUM_OF_SERVERITIES) {
+                osstream << " [" << severities[severity] << "] ";
+            } else osstream << " ";
+
+            constexpr auto argsSize = sizeof...(Args);
+            if (argsSize > 0) {
+                osstream << std::vformat(f, std::make_format_args(std::forward<Args>(args)...));
+            } else {
+                osstream << f;
+            }
+            
+            std::cout << osstream.str() << std::endl;
+        } catch (const std::exception& ex) {
+            std::cout << ex.what() << std::endl;
+        } catch (...) {
+            // ignore
+        }
+
     }
 
     // Log(int level) : logLevel_{level} {}
