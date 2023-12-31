@@ -13,39 +13,13 @@ const std::string Log::severities[NUM_OF_SERVERITIES] {
     "FATAL"
 };
 
-int Log::logLevel_ = 0;
+unsigned int Log::logLevel_ = 0;
 
-void Log::trace(const std::string& message) {
-    // std::cout << "[TRACE] " << message << std::endl;
-    log(TRACE, message);
-}
+Log Log::trace{TRACE};
+Log Log::debug{DEBUG};
+Log Log::info{INFO};
+Log Log::warn{WARN};
+Log Log::error{ERROR};
+Log Log::fatal{FATAL};
 
-void Log::debug(const std::string& message) {
-    // std::cout << "[DEBUG] " << message << std::endl;
-    log(DEBUG, message);
-}
-
-void Log::info(const std::string& message) {
-    // std::cout << "[INFO] " << message << std::endl;
-    log(INFO, message);
-}
-
-void Log::warn(const std::string& message) {
-    // std::cout << "[WARN] " << message << std::endl;
-    log(WARN, message);
-}
-
-void Log::error(const std::string& message) {
-    // std::cout << "[ERROR] " << message << std::endl;
-    log(ERROR, message);
-}
-
-void Log::fatal(const std::string& message) {
-    // std::cout << "[FATAL] " << message << std::endl;
-    log(FATAL, message);
-}
-
-// void Log::log(const std::string& message) {
-//     std::cout << message << std::endl;
-// }
 } // namespace ElasticJean

@@ -11,23 +11,44 @@ namespace elasticJeans{
 class Log {
     static constexpr size_t NUM_OF_SERVERITIES = 7;
 public:
-    const static int TRACE = 1;
-    const static int DEBUG = 2;
-    const static int INFO = 3;
-    const static int WARN = 4;
-    const static int ERROR = 5;
-    const static int FATAL = 6;
+    static constexpr int TRACE = 1;
+    static constexpr int DEBUG = 2;
+    static constexpr int INFO = 3;
+    static constexpr int WARN = 4;
+    static constexpr int ERROR = 5;
+    static constexpr int FATAL = 6;
 
     static const std::string severities[NUM_OF_SERVERITIES];
 
-    // static Log fatal;
+    static Log trace;
+    static Log info;
+    static Log debug;
+    static Log warn;
+    static Log error;
+    static Log fatal;
 
-    static void trace(const std::string& message);
-    static void info(const std::string& message);
-    static void debug(const std::string& message);
-    static void warn(const std::string& message);
-    static void error(const std::string& message);
-    static void fatal(const std::string& message);
+    Log() : Log(INFO) {}
+
+    Log(int severity) : severity_(severity) {}
+
+    static void setLogLevel(unsigned int level) {
+        if (level < NUM_OF_SERVERITIES)
+            logLevel_ = level; 
+    }
+
+    static unsigned int getLogLevel() {
+        return logLevel_;
+    } 
+
+    template<typename... Args>
+    void operator()(const std::string& f, Args&&... args) {
+        log(this->severity_, f, std::forward<Args>(args)...);
+    }
+
+    template<typename... Args>
+    static void log(const std::string& f, Args&&... args) {
+        log(0, f, std::forward<Args>(args)...);
+    }
 
     template<typename... Args>
     static void log(int severity, const std::string& f, Args&&... args) {
@@ -63,11 +84,10 @@ public:
 
     }
 
-    // Log(int level) : logLevel_{level} {}
-
 private:
     static std::string filePath;
-    static int logLevel_;
+    static unsigned int logLevel_;
+    unsigned int severity_;
 
 };
 
