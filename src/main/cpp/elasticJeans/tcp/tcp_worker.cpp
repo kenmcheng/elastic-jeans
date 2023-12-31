@@ -23,9 +23,9 @@ void Workers::handle(int conn_socket_fd, const sockaddr_in& scaddr) {
 
 void Workers::doHandle(int conn_socket_fd, const sockaddr_in& scaddr) {
     try {
-        Log::info("New connection built, _fd: " + std::to_string(conn_socket_fd));
-        Log::info("accepted ip: " + std::string{inet_ntoa(scaddr.sin_addr)});
-        Log::info("accepted port: " + std::to_string((int) ntohs(scaddr.sin_port)));
+        Log::trace("New connection built, _fd: {}", conn_socket_fd);
+        Log::trace("accepted ip: {}", inet_ntoa(scaddr.sin_addr));
+        Log::trace("accepted port: {}", ntohs(scaddr.sin_port));
         Connection conn{conn_socket_fd,
                          std::string{inet_ntoa(scaddr.sin_addr)},
                         (int) ntohs(scaddr.sin_port), 

@@ -30,6 +30,7 @@ private:
     std::string ipv4Address_;
     int port_;
     int socket_ipv4_fd_;
+    int socketQueueSize_ = 30;
     struct sockaddr_in socketAddress_;
     unsigned int socketAddress_len_;
     bool stop_ = false;

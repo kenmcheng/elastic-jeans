@@ -62,17 +62,16 @@ void TcpListener::stop() {
 }
 
 void TcpListener::_listen_ipv4() {
-    listen(socket_ipv4_fd_, 30);
-    std::ostringstream osstream;
-    osstream << "*** Listening on ADDRESS: " << inet_ntoa(socketAddress_.sin_addr) << " PORT: " << ntohs(socketAddress_.sin_port) << " ***\n\n";
-    Log::info(osstream.str());
-
+    listen(socket_ipv4_fd_, socketQueueSize_);
+    // std::ostringstream osstream;
+    // osstream << "*** Listening on ADDRESS: " << inet_ntoa(socketAddress_.sin_addr) << " PORT: " << ntohs(socketAddress_.sin_port) << " ***\n\n";
+    Log::info("*** Listening on ADDRESS: {} PORT: {} ***\n", inet_ntoa(socketAddress_.sin_addr), ntohs(socketAddress_.sin_port));
     
     while (true) {
         int conn_socket_fd = this->_accept_ipv4();
 
         if (conn_socket_fd < 0) {
-            Log::warn("socket connection error. _fd: " + std::to_string(conn_socket_fd));
+            Log::warn("socket connection error. _fd: {}", std::to_string(conn_socket_fd));
             close(conn_socket_fd);
             if (stop_) break;
             else continue;

@@ -14,7 +14,7 @@ thread_local std::unique_ptr<HttpRequest> reqPtr;
 thread_local std::unique_ptr<HttpResponse> respPtr;
 
 int HttpServer::start() {
-    Log::info(ipAddress_ + ":" + std::to_string(port_) );
+    Log::info("{}:{}", ipAddress_ , std::to_string(port_));
 
     if (withSecure_) {
         tcp_.registerCbFunc([this](tcp::Connection& tcpConnection) -> int {

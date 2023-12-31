@@ -15,7 +15,7 @@ namespace tcp  {
 Connection::Connection(int socket_fd, std::string initIP, int initPort, std::string recIP, int recPort) :
     conn_socket_fd_{socket_fd},
     initiatorIP_{initIP}, initiatorPort_{initPort},
-    receiverIP_{recIP}, receiverPort_(recPort) {
+    receiverIP_{recIP}, receiverPort_{recPort} {
 
 }
 
@@ -32,7 +32,7 @@ std::string Connection::receiveData(int bufferSize) {
     int retries = 0;
     while ((fetched = recv(conn_socket_fd_, buffer, bufferSize, MSG_DONTWAIT)) > 0 || (bytesReceived == 0 && retries++ < 3)) {
         if (fetched <= 0) {
-            Log::debug("Failed to read, retries: " + std::to_string(retries));
+            Log::debug("Failed to read, retries: {}", retries);
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             continue;
         }
@@ -42,10 +42,10 @@ std::string Connection::receiveData(int bufferSize) {
     }
     
     if (bytesReceived == 0) {
-        Log::error("Failed to read bytes from client socket connection, last read: " + std::to_string(fetched));
+        Log::error("Failed to read bytes from client socket connection, last read: {}", fetched);
         throw "Failed to read bytes from client socket connection";
     } else
-        Log::info("Read bytes: " + std::to_string(bytesReceived));
+        Log::info("Read bytes: {}", bytesReceived);
 
     return osstream.str();
 }

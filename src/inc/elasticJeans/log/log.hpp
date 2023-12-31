@@ -11,12 +11,12 @@ namespace elasticJeans{
 class Log {
     static constexpr size_t NUM_OF_SERVERITIES = 7;
 public:
-    static constexpr int TRACE = 1;
-    static constexpr int DEBUG = 2;
-    static constexpr int INFO = 3;
-    static constexpr int WARN = 4;
-    static constexpr int ERROR = 5;
-    static constexpr int FATAL = 6;
+    static constexpr unsigned int TRACE = 1;
+    static constexpr unsigned int DEBUG = 2;
+    static constexpr unsigned int INFO = 3;
+    static constexpr unsigned int WARN = 4;
+    static constexpr unsigned int ERROR = 5;
+    static constexpr unsigned int FATAL = 6;
 
     static const std::string severities[NUM_OF_SERVERITIES];
 
@@ -27,9 +27,9 @@ public:
     static Log error;
     static Log fatal;
 
-    Log() : Log(INFO) {}
+    Log() : Log{INFO} {}
 
-    Log(int severity) : severity_(severity) {}
+    Log(unsigned int severity) : severity_{severity} {}
 
     static void setLogLevel(unsigned int level) {
         if (level < NUM_OF_SERVERITIES)
@@ -51,7 +51,7 @@ public:
     }
 
     template<typename... Args>
-    static void log(int severity, const std::string& f, Args&&... args) {
+    static void log(unsigned int severity, const std::string& f, Args&&... args) {
         if (severity < logLevel_) return;
         try {
             char buf[1000];
