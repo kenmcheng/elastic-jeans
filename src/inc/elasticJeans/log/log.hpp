@@ -56,7 +56,7 @@ public:
 
     template<typename... Args>
     void operator()(const LogSource& f, Args&&... args) {
-        log(this->severity_, f.location.file_name(), f.location.function_name(), f.location.line(), f.msg, std::forward<Args>(args)...);
+        log(this->severity_, f.location.function_name(), f.location.line(), f.msg, std::forward<Args>(args)...);
     }
 
     template<typename... Args>
@@ -92,7 +92,13 @@ public:
 
             constexpr auto argsSize = sizeof...(Args);
             if (argsSize > 0) {
-                osstream << std::vformat(f, std::make_format_args(std::forward<Args>(args)...));
+                try {
+                    osstream << std::vformat(f, std::make_format_args(std::forward<Args>(args)...));
+                } catch (...) {
+                    osstream << f << " [";
+                    ((osstream << args << ' '), ...);
+                    osstream << "]";
+                }
             } else {
                 osstream << f;
             }
