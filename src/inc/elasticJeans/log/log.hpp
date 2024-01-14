@@ -5,6 +5,7 @@
 #include <format>
 #include <iostream>
 #include <iomanip>
+#include <source_location>
 
 namespace elasticJeans{
 
@@ -20,12 +21,25 @@ public:
 
     static const std::string severities[NUM_OF_SERVERITIES];
 
+    struct LogSource {
+        std::string_view        msg;
+        std::source_location    location;
+
+        LogSource(char const * msg, 
+            std::source_location location = std::source_location::current()) : msg{msg}, location{location}
+        {}
+
+        LogSource(const std::string& msg, 
+            std::source_location location = std::source_location::current()) : msg{msg}, location{location}
+        {}
+    };
+
     static Log trace;
     static Log info;
     static Log debug;
     static Log warn;
     static Log error;
-    static Log fatal;
+    static Log fatal;    
 
     Log() : Log{INFO} {}
 
@@ -41,17 +55,21 @@ public:
     } 
 
     template<typename... Args>
-    void operator()(const std::string& f, Args&&... args) {
-        log(this->severity_, f, std::forward<Args>(args)...);
+    void operator()(const LogSource& f, Args&&... args) {
+        log(this->severity_, f.location.file_name(), f.location.function_name(), f.location.line(), f.msg, std::forward<Args>(args)...);
     }
 
     template<typename... Args>
     static void log(const std::string& f, Args&&... args) {
-        log(0, f, std::forward<Args>(args)...);
+        log(0, "", "", 0, f, std::forward<Args>(args)...);
     }
 
     template<typename... Args>
-    static void log(unsigned int severity, const std::string& f, Args&&... args) {
+    static void log(unsigned int severity, 
+                const std::string_view fnName, 
+                int lineNo, 
+                const std::string_view f, 
+                Args&&... args) {
         if (severity < logLevel_) return;
         try {
             char buf[1000];
@@ -67,6 +85,10 @@ public:
             if (severity > 0 && severity < NUM_OF_SERVERITIES) {
                 osstream << " [" << severities[severity] << "] ";
             } else osstream << " ";
+
+            if (fnName.size() > 0) {
+                osstream << "[" << fnName << ":" << lineNo << "] ";
+            }
 
             constexpr auto argsSize = sizeof...(Args);
             if (argsSize > 0) {
@@ -88,7 +110,6 @@ private:
     static std::string filePath;
     static unsigned int logLevel_;
     unsigned int severity_;
-
 };
 
 } // namespace elasticJeans
