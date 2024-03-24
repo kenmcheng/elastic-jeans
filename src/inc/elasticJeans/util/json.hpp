@@ -178,7 +178,7 @@ public:
     std::string jsonize(bool compact = true, int indent = 0) override { return serialize(compact, indent, true); }
 
     std::string serialize(bool compact = true, int indent = 0, bool convertJson = true) override {
-        return convertJson ? "\"" + jsonizeString(str_) + "\"" : "\"" + str_ + "\"";
+        return convertJson ? "\"" + jsonizeString(str_) + "\"" : str_;
     }
 
 private:

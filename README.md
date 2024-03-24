@@ -13,10 +13,15 @@ The following tools have to be installed in your linux environment
 - make (version 4.3 or later)
 #### Libraries
 - OpenSSL ([GitHub](https://github.com/openssl/openssl))
+#### Libraries for test
+- GoogleTest ([Website](https://google.github.io/googletest/), [GitHub](https://github.com/google/googletest))
 
 ### Command
 ```
-cmake CMakeLists.txt && make
+cmake -S . -B build
+```
+```
+cmake --build build
 ```
 
 ## Usage
