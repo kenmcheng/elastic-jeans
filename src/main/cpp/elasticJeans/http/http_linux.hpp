@@ -8,10 +8,13 @@
 
 #include <elasticJeans/restful/rest_api_registry.hpp>
 
-// #include <memory>
+#include <memory>
 #include <string>
+#include <vector>
 #include <iostream>
 #include <csignal>
+#include <utility>
+#include <algorithm>
 
 namespace elasticJeans {
 namespace http {
@@ -21,12 +24,22 @@ extern thread_local std::unique_ptr<HttpResponse> respPtr;
 
 class HttpServer {
 public:
+    HttpServer() = default;
     HttpServer(std::string ipAddress, int port, bool withSecure = false):
         ipAddress_(ipAddress),
-        port_(port),
-        tcp_(ipAddress, port),
-        withSecure_(withSecure) {
-        
+        port_(port) {
+
+        if (withSecure) {
+            listeners_.emplace_back(std::make_unique<tcp::TcpListener>(
+            ipAddress, 
+            port, 
+            32, 
+            std::make_unique<tls::Handshaker>()));
+        } else {
+            listeners_.emplace_back(std::make_unique<tcp::TcpListener>(
+            ipAddress, 
+            port));
+        }
     }
 
     ~HttpServer() = default;
@@ -35,6 +48,8 @@ public:
 
     int receive(tcp::Connection& tcpConnection);
 
+    int handleRequest(const std::string& received);
+
     int tlsHandshake(tcp::Connection& tcpConnection);
 
     // RestApiRegistry& getRestApiRegister() { return apis; }
@@ -42,8 +57,9 @@ public:
 private:
     std::string ipAddress_;
     int port_;
-    tcp::TcpListener tcp_;
-    bool withSecure_;
+    std::vector<std::unique_ptr<tcp::TcpListener>> listeners_;
+    // tcp::TcpListener tcp_;
+    // bool withSecure_;
 
     // RestApiRegistry apis;
 };

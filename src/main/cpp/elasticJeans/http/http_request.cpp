@@ -8,6 +8,8 @@
 namespace elasticJeans {
 namespace http {
 
+thread_local std::unique_ptr<HttpRequest> reqPtr;
+
 const std::string HttpRequest::REQUSET_DELIMITER_CRLF = "\r\n\r\n";
 const std::string HttpRequest::REQUSET_DELIMITER_LF = "\n\n";
 const std::string HttpRequest::HEADER_DELIMITER = ":";

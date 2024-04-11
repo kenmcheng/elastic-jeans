@@ -36,7 +36,7 @@ public:
     std::unique_lock<std::mutex> lock() { return std::unique_lock(mtx_); };
 
 private:
-    bool terminate_;
+    bool terminate_ = false;
     std::mutex mtx_;
     std::condition_variable cv_;
     std::queue<std::function<void()>> tasks_;

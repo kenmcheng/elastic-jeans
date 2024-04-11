@@ -5,6 +5,7 @@
 
 #include <algorithm> 
 #include <string>
+#include <memory>
 
 namespace elasticJeans {
 namespace http {
@@ -90,6 +91,8 @@ private:
     std::string payload_;
 
 };
+
+extern thread_local std::unique_ptr<HttpRequest> reqPtr;
 
 } // namespace http
 } // namespace elasticJeans

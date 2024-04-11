@@ -30,7 +30,7 @@ if (OPENSSL_FOUND)
     target_link_libraries(${EJ_LIB} OpenSSL::SSL OpenSSL::Crypto)
     message(STATUS "Found OpenSSL ${OPENSSL_VERSION}")
 else()
-    message(STATUS "Downloading OpenSSL lib from github with version ${openssl_tag}")
+    message(STATUS "Try to download OpenSSL lib from github with version ${openssl_tag}")
 
     include(ExternalProject)
     set(OPENSSL_SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/_deps/openssl-src)

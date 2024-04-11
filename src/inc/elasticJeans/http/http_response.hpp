@@ -5,6 +5,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <memory>
 
 namespace elasticJeans {
 namespace http {
@@ -40,6 +41,8 @@ private:
     HeaderList headers_;
     std::string content_;
 };
+
+extern thread_local std::unique_ptr<HttpResponse> respPtr;
 
 } // namespace http
 } // namespace elasticJeans

@@ -11,12 +11,13 @@
 namespace elasticJeans {
 namespace tcp {
 
-TcpListener::TcpListener(std::string ipAddress, int port, int workerPoolSize):
+TcpListener::TcpListener(std::string ipAddress, int port, int workerPoolSize, std::unique_ptr<TcpHandler> handler):
         ipv4Address_(ipAddress), 
         port_(port),
         socketAddress_len_(sizeof(socketAddress_)) {
-    
-    workers_ = std::make_unique<Workers>(this, workerPoolSize);
+    handler_ = move(handler);
+    handler_->setTcpListener(this);
+    workers_ = std::make_shared<Workers>(workerPoolSize);
 
     socketAddress_.sin_family = AF_INET;
     socketAddress_.sin_port = htons(port_);
@@ -77,7 +78,9 @@ void TcpListener::_listen_ipv4() {
             else continue;
         }
 
-        workers_->handle(conn_socket_fd, socketAddress_);
+        workers_->handle([this, conn_socket_fd]() {
+            handler_->doHandle(conn_socket_fd, socketAddress_);
+        });
     }
 }
 

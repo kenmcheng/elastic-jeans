@@ -10,23 +10,31 @@
 namespace elasticJeans {
 namespace http {
 
-thread_local std::unique_ptr<HttpRequest> reqPtr;
-thread_local std::unique_ptr<HttpResponse> respPtr;
+extern thread_local std::unique_ptr<HttpRequest> reqPtr;
+extern thread_local std::unique_ptr<HttpResponse> respPtr;
 
 int HttpServer::start() {
-    Log::info("{}:{}", ipAddress_ , std::to_string(port_));
+    // Log::info("{}:{}", ipAddress_ , std::to_string(port_));
 
-    if (withSecure_) {
-        tcp_.registerCbFunc([this](tcp::Connection& tcpConnection) -> int {
-            return tlsHandshake(tcpConnection);
+    // if (withSecure_) {
+    //     tcp_.registerCbFunc([this](tcp::Connection& tcpConnection) -> int {
+    //         return tlsHandshake(tcpConnection);
+    //     });
+    // }
+
+    // tcp_.registerCbFunc([this](tcp::Connection& tcpConnection) -> int {
+    //     return receive(tcpConnection);
+    // });
+    
+    // tcp_.start();
+
+    for (auto& listrPtr : listeners_) {
+        listrPtr->registerCbFunc([this](tcp::Connection& tcpConnection) -> int {
+            return receive(tcpConnection);
         });
+
+        listrPtr->start();
     }
-
-    tcp_.registerCbFunc([this](tcp::Connection& tcpConnection) -> int {
-        return receive(tcpConnection);
-    });
-
-    tcp_.start();
     return 0;
 }
 
@@ -35,32 +43,36 @@ int HttpServer::receive(tcp::Connection& tcpConnection) {
     reqPtr = std::make_unique<HttpRequest>();
     respPtr = std::make_unique<HttpResponse>();
 
-    try {
-        reqPtr->parse(received);
-    } catch (std::exception e) {
-        return 0;
-    }
-
-    auto apiOpt = RestApiRegistry::getInstance().lookFor(reqPtr->getMethod(), reqPtr->getPath());
-
-    if (apiOpt.has_value()) {
-        apiOpt->get()->invoke();
-    } else {
-        respPtr->setStatus(404);
-    }
+    handleRequest(received);
 
     tcpConnection.sendData(respPtr->prepare());
+
     reqPtr.reset();
     respPtr.reset();
     return 0;
 }
 
-int HttpServer::tlsHandshake(tcp::Connection& tcpConnection) {
-    std::string received = tcpConnection.receiveData();
-    tls::Handshaker handshaker;
-    handshaker.hello(received);
+int HttpServer::handleRequest(const std::string& received) {
+    try {
+        reqPtr->parse(received);
+
+        auto apiPtrOpt = RestApiRegistry::getInstance().lookFor(reqPtr->getMethod(), reqPtr->getPath());
+        if (apiPtrOpt.has_value()) {
+            apiPtrOpt->get()->invoke();
+        } else {
+            respPtr->setStatus(404);
+        }
+    } catch(std::exception& ex) {
+        respPtr->setStatus(500);
+        respPtr->setContent("Internal server error");
+    } catch(...) {
+        respPtr->setStatus(500);
+        respPtr->setContent("Internal server error");
+    }
+
     return 0;
 }
+
 
 } // namespace http
 } // namespace elasticJeans

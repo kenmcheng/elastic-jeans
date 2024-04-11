@@ -21,13 +21,13 @@ public:
 
     bool getAutoClose() { return autoClose_; }
 
-    std::string receiveData(int bufferSize = 0x800);
+    virtual std::string receiveData(ssize_t bufferSize = 0x800);
 
-    void sendData(const std::string& date);
+    virtual void sendData(const std::string& date);
 
     void fin();
 
-private:
+protected:
     bool closed_ = false;
     bool autoClose_ = true;
     int conn_socket_fd_;
@@ -35,6 +35,25 @@ private:
     int initiatorPort_;
     std::string receiverIP_;
     int receiverPort_;
+};
+
+class DefaultConnection: public Connection {
+public:
+    DefaultConnection &operator=(const DefaultConnection &) = delete;
+
+    DefaultConnection() = default;
+
+    DefaultConnection(
+        int socket_fd, 
+        std::string initIP, 
+        int initPort, 
+        std::string recIP, 
+        int recPort
+        ) : Connection(socket_fd, initIP, initPort, recIP, recPort) {}
+
+    ~DefaultConnection() = default;
+
+
 };
 
 } // namespace tcp

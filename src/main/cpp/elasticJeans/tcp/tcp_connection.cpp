@@ -23,7 +23,7 @@ Connection::~Connection() {
     if (autoClose_ && !closed_) fin();
 }
 
-std::string Connection::receiveData(int bufferSize) {
+std::string Connection::receiveData(ssize_t bufferSize) {
     std::ostringstream osstream;
     ssize_t bytesReceived = 0;
     char buffer[bufferSize];

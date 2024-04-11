@@ -1,9 +1,12 @@
 #ifndef _ELASTICJEANS_TCP_LINUX_H
 #define _ELASTICJEANS_TCP_LINUX_H
 
+#include <elasticJeans/tcp/tcp_handler.hpp>
 #include <elasticJeans/tcp/tcp_worker.hpp>
+#include <elasticJeans/tls/handshaker.hpp>
 
 #include <string>
+#include <type_traits>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
@@ -13,11 +16,18 @@ namespace elasticJeans {
 namespace tcp {
 
 class TcpListener {
-    friend class Workers;
+    friend class DefaultTcpHandler;
+    friend class tls::Handshaker;
 
 public:
-    TcpListener(std::string ipAddress = "127.0.0.1", int port = 8080, int workerPoolSize = 32);
+    TcpListener(std::string ipAddress = "127.0.0.1", 
+                int port = 8080, 
+                int workerPoolSize = 32,
+                std::unique_ptr<TcpHandler> handler = std::make_unique<DefaultTcpHandler>());
     ~TcpListener();
+
+    TcpListener(TcpListener&&) = default;
+    TcpListener& operator=(TcpListener&&) = default;
 
     int init();
     void start();
@@ -34,7 +44,8 @@ private:
     struct sockaddr_in socketAddress_;
     unsigned int socketAddress_len_;
     bool stop_ = false;
-    std::unique_ptr<Workers> workers_;
+    std::unique_ptr<TcpHandler> handler_;
+    std::shared_ptr<Workers> workers_;
 
     void _listen_ipv4();
     int _accept_ipv4();
@@ -43,7 +54,7 @@ private:
 
 template<typename F>
 int TcpListener::registerCbFunc(F&& f) {
-    return workers_->registerCbFunc(std::forward<F>(f));
+    return handler_->registerCbFunc(std::forward<F>(f));
 }
 
 } // namespace tcp

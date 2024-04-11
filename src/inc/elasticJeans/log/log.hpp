@@ -21,6 +21,9 @@ public:
 
     static const std::string severities[NUM_OF_SERVERITIES];
 
+    /**
+     * This data type is used to keeping source location which will eventally be written into log.
+     */
     struct LogSource {
         std::string_view        msg;
         std::source_location    location;
@@ -72,6 +75,7 @@ public:
                 Args&&... args) {
         if (severity < logLevel_) return;
         try {
+            // get current time
             char buf[1000];
             time_t now = time(0);
             struct tm tm = *gmtime(&now);

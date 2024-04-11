@@ -6,6 +6,8 @@
 namespace elasticJeans {
 namespace http {
 
+thread_local std::unique_ptr<HttpResponse> respPtr;
+
 void HttpResponse::setContent(std::string content) {
     headers_["Content-Length"] = std::to_string(content.size());
     this->content_ = std::move(content);
