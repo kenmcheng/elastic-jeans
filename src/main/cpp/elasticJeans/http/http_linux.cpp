@@ -10,64 +10,100 @@
 namespace elasticJeans {
 namespace http {
 
-extern thread_local std::unique_ptr<HttpRequest> reqPtr;
-extern thread_local std::unique_ptr<HttpResponse> respPtr;
+extern thread_local std::unique_ptr<HttpRequest> request;
+extern thread_local std::unique_ptr<HttpResponse> response;
+
+HttpServer::HttpServer(std::string ipAddress)
+: ipAddress_{ipAddress} {
+    tcpWorkers_ = std::make_shared<tcp::Workers>();
+    listenerThreadPool_ = std::make_unique<ThreadPool>();
+}
+
+HttpServer::~HttpServer() {
+    stop();
+}
+
+void HttpServer::http(int port) {
+    http(ipAddress_, port);
+}
+
+void HttpServer::http(std::string ipAddress, int port) {
+    listeners_.emplace_back(
+        std::make_unique<tcp::TcpListener>(
+            ipAddress, 
+            port,
+            tcpWorkers_)
+    );
+}
+
+void HttpServer::https(int port) {
+    https(ipAddress_, port);
+}
+
+void HttpServer::https(std::string ipAddress, int port) {
+    listeners_.emplace_back(
+        std::make_unique<tcp::TcpListener>(
+            ipAddress, 
+            port, 
+            tcpWorkers_, 
+            std::make_unique<tls::Handshaker>())
+    );
+}
+
 
 int HttpServer::start() {
-    // Log::info("{}:{}", ipAddress_ , std::to_string(port_));
-
-    // if (withSecure_) {
-    //     tcp_.registerCbFunc([this](tcp::Connection& tcpConnection) -> int {
-    //         return tlsHandshake(tcpConnection);
-    //     });
-    // }
-
-    // tcp_.registerCbFunc([this](tcp::Connection& tcpConnection) -> int {
-    //     return receive(tcpConnection);
-    // });
-    
-    // tcp_.start();
+    tcpWorkers_->run();
 
     for (auto& listrPtr : listeners_) {
         listrPtr->registerCbFunc([this](tcp::Connection& tcpConnection) -> int {
             return receive(tcpConnection);
         });
 
-        listrPtr->start();
+        listenerThreadPool_->add(std::thread([&listrPtr] {
+            listrPtr->start();
+        }));
     }
+    return 0;
+}
+
+int HttpServer::stop() {
+    for (auto& listener : listeners_) {
+        listener->stop();
+    }
+    listenerThreadPool_->terminate();
     return 0;
 }
 
 int HttpServer::receive(tcp::Connection& tcpConnection) {
     std::string received = tcpConnection.receiveData();
-    reqPtr = std::make_unique<HttpRequest>();
-    respPtr = std::make_unique<HttpResponse>();
+    request = std::make_unique<HttpRequest>();
+    response = std::make_unique<HttpResponse>();
 
     handleRequest(received);
 
-    tcpConnection.sendData(respPtr->prepare());
+    tcpConnection.sendData(response->prepare());
 
-    reqPtr.reset();
-    respPtr.reset();
+    request.reset();
+    response.reset();
     return 0;
 }
 
 int HttpServer::handleRequest(const std::string& received) {
     try {
-        reqPtr->parse(received);
+        request->parse(received);
 
-        auto apiPtrOpt = RestApiRegistry::getInstance().lookFor(reqPtr->getMethod(), reqPtr->getPath());
+        auto apiPtrOpt = RestApiRegistry::getInstance().lookFor(request->getMethod(), request->getPath());
         if (apiPtrOpt.has_value()) {
             apiPtrOpt->get()->invoke();
         } else {
-            respPtr->setStatus(404);
+            response->setStatus(404);
         }
     } catch(std::exception& ex) {
-        respPtr->setStatus(500);
-        respPtr->setContent("Internal server error");
+        response->setStatus(500);
+        response->setContent("Internal server error");
     } catch(...) {
-        respPtr->setStatus(500);
-        respPtr->setContent("Internal server error");
+        response->setStatus(500);
+        response->setContent("Internal server error");
     }
 
     return 0;

@@ -27,6 +27,8 @@ public:
 private:
     virtual void start() = 0;
 
+    virtual void stop() = 0;
+
     virtual App& http(const std::string& ip, int port) = 0;
 
     virtual App& https(const std::string& ip, int port) = 0;

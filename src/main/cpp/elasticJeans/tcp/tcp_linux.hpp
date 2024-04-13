@@ -9,7 +9,7 @@
 #include <type_traits>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-
+#include <atomic>
 
 namespace elasticJeans {
 
@@ -20,11 +20,17 @@ class TcpListener {
     friend class tls::Handshaker;
 
 public:
-    TcpListener(std::string ipAddress = "127.0.0.1", 
-                int port = 8080, 
-                int workerPoolSize = 32,
-                std::unique_ptr<TcpHandler> handler = std::make_unique<DefaultTcpHandler>());
+
+    TcpListener(
+        std::string ipAddress = "127.0.0.1", 
+        int port = 8080,
+        std::shared_ptr<Workers> workers = std::make_shared<Workers>(),
+        std::unique_ptr<TcpHandler> handler = std::make_unique<DefaultTcpHandler>());
+
     ~TcpListener();
+
+    TcpListener(TcpListener&) = delete;
+    TcpListener& operator=(TcpListener&) = delete;
 
     TcpListener(TcpListener&&) = default;
     TcpListener& operator=(TcpListener&&) = default;
@@ -37,13 +43,15 @@ public:
     int registerCbFunc(F&& f);
 
 private:
+    std::atomic<bool> init_ = false;
+    bool stop_ = false;
     std::string ipv4Address_;
     int port_;
     int socket_ipv4_fd_;
     int socketQueueSize_ = 30;
     struct sockaddr_in socketAddress_;
     unsigned int socketAddress_len_;
-    bool stop_ = false;
+    
     std::unique_ptr<TcpHandler> handler_;
     std::shared_ptr<Workers> workers_;
 

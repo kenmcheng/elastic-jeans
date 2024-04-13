@@ -14,6 +14,12 @@
 namespace elasticJeans {
 namespace tcp {
 
+int Workers::run() {
+    threadPoolExecutor_->start();
+
+    return 0;
+}
+
 
 } // namespace tcp
 } // namespace elasticJeans

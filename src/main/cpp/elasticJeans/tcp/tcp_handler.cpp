@@ -19,11 +19,12 @@ void DefaultTcpHandler::doHandle(int conn_socket_fd, const sockaddr_in& scaddr) 
         Log::trace("accepted ip: {}", inet_ntoa(scaddr.sin_addr));
         Log::trace("accepted port: {}", ntohs(scaddr.sin_port));
         Log::trace("listener: {}:{}", tcpListener_->ipv4Address_, tcpListener_->port_);
-        DefaultConnection conn{conn_socket_fd,
-                         std::string{inet_ntoa(scaddr.sin_addr)},
-                        (int) ntohs(scaddr.sin_port), 
-                        tcpListener_->ipv4Address_, 
-                        tcpListener_->port_};
+        DefaultConnection conn{
+            conn_socket_fd,
+            std::string{inet_ntoa(scaddr.sin_addr)},
+            (int) ntohs(scaddr.sin_port), 
+            tcpListener_->ipv4Address_, 
+            tcpListener_->port_};
 
         runCbFunc(conn);
 

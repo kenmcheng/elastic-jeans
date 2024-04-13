@@ -92,8 +92,6 @@ private:
 
 };
 
-extern thread_local std::unique_ptr<HttpRequest> reqPtr;
-
 } // namespace http
 } // namespace elasticJeans
 

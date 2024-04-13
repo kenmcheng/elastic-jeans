@@ -7,15 +7,19 @@
 #include <memory>
 #include <arpa/inet.h>
 
+#define DEFAULT_WORKER_SIZE 32
+
 namespace elasticJeans {
 namespace tcp {
 
 class Workers {
 public:
-    Workers(size_t poolSize = 32) :
+    Workers(size_t poolSize = DEFAULT_WORKER_SIZE) :
         poolSize_{poolSize} {
-        threadPoolExecutor_ = std::make_unique<ThreadPoolExecutor>(poolSize);
+        threadPoolExecutor_ = std::make_unique<ThreadPoolExecutor>(poolSize, __LONG_LONG_MAX__, false);
     }
+
+    int run();
 
     template<typename F>
     void handle(F&& f);

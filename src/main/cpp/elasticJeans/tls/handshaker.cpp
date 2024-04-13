@@ -20,8 +20,8 @@ namespace elasticJeans {
 namespace tls {
 
 Handshaker::Handshaker() {
-    if (init() < 0)
-        cleanup();
+    if (init() < 0) {}
+        // cleanup();
 }
 
 Handshaker::~Handshaker() {
@@ -39,6 +39,7 @@ int Handshaker::init() {
     if (SSL_CTX_use_certificate_file(ctx_.get(), certificateFile_.c_str(), SSL_FILETYPE_PEM) > 0 &&
         SSL_CTX_use_PrivateKey_file(ctx_.get(), privateKeyFile_.c_str(), SSL_FILETYPE_PEM) > 0) {
         Log::info("SSL cert set!");
+        init_ = true;
         return 0;
     }
 

@@ -6,7 +6,7 @@
 namespace elasticJeans {
 namespace http {
 
-thread_local std::unique_ptr<HttpResponse> respPtr;
+thread_local std::unique_ptr<HttpResponse> response;
 
 void HttpResponse::setContent(std::string content) {
     headers_["Content-Length"] = std::to_string(content.size());
@@ -42,7 +42,8 @@ std::string HttpResponse::toString() {
 void HttpResponse::setCurrentDate() {
     char buf[1000];
     time_t now = time(0);
-    struct tm tm = *gmtime(&now);
+    struct tm tm;
+    gmtime_r(&now, &tm);
     static const char* dateFormat = "%a, %d %b %Y %H:%M:%S %Z";
     strftime(buf, sizeof buf, dateFormat, &tm);
 

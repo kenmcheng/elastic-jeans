@@ -7,6 +7,7 @@
 #include <memory>
 #include <functional>
 #include <arpa/inet.h>
+#include <atomic>
 
 #define PROCEED 0
 #define INTERRUPT_WO_CLOSE 1
@@ -36,9 +37,14 @@ public:
 
     TcpListener* getTcpListener() { return this->tcpListener_; }
 
+    bool isInit() { return init_; }
+
 protected:
+    std::atomic<bool> init_ = false;
     std::vector<uniqueCbFn> fnChain;
     TcpListener* tcpListener_;
+
+    virtual int init() { init_ = true; return 0; }
 
     virtual void runCbFunc(Connection& conn);
 };

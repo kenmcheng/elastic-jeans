@@ -3,10 +3,12 @@
 
 #include <csignal>
 #include <memory>
+#include <thread>
 
 namespace elasticJeans {
 
 std::unique_ptr<App> appPtr;
+std::unique_ptr<std::thread> runner;
 
 void sigFunc(int signal) {
     appPtr.reset();
@@ -31,7 +33,10 @@ App::Initiator::Initiator() {
 }
 
 void App::Initiator::start() {
-    appPtr->start();
+    runner = std::make_unique<std::thread>([] {
+        appPtr->start();
+    });
+    runner->join();
 }
 
 App::Initiator& App::Initiator::http(const std::string& ip, int port) {

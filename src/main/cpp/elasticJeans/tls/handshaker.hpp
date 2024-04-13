@@ -23,7 +23,7 @@ public:
 
     ~Handshaker();
 
-    int init();
+    int init() override;
 
     void doHandle(int conn_socket_fd, const sockaddr_in& scaddr) override;
 
@@ -37,8 +37,8 @@ public:
 
 private:
     std::unique_ptr<SSL_CTX, SSLCtxDel> ctx_;
-    std::string certificateFile_;
-    std::string privateKeyFile_;
+    std::string certificateFile_ = "";
+    std::string privateKeyFile_ = "";
 
     void initSSL();
 

@@ -19,47 +19,43 @@
 namespace elasticJeans {
 namespace http {
 
-extern thread_local std::unique_ptr<HttpRequest> reqPtr;
-extern thread_local std::unique_ptr<HttpResponse> respPtr;
+extern thread_local std::unique_ptr<HttpRequest> request;
+extern thread_local std::unique_ptr<HttpResponse> response;
 
 class HttpServer {
 public:
-    HttpServer() = default;
-    HttpServer(std::string ipAddress, int port, bool withSecure = false):
-        ipAddress_(ipAddress),
-        port_(port) {
+    HttpServer(std::string ipAddress = "127.0.0.1");
+    // HttpServer(std::string ipAddress, int port, bool withSecure = false):
+    //     ipAddress_(ipAddress),
+    //     port_(port) {
 
-        if (withSecure) {
-            listeners_.emplace_back(std::make_unique<tcp::TcpListener>(
-            ipAddress, 
-            port, 
-            32, 
-            std::make_unique<tls::Handshaker>()));
-        } else {
-            listeners_.emplace_back(std::make_unique<tcp::TcpListener>(
-            ipAddress, 
-            port));
-        }
-    }
+    // }
 
-    ~HttpServer() = default;
+    ~HttpServer();
+
+    void http(int port);
+
+    void http(std::string ipAddress, int port);
+
+    void https(int port);
+
+    void https(std::string ipAddress, int port);
     
     int start();
+
+    int stop();
 
     int receive(tcp::Connection& tcpConnection);
 
     int handleRequest(const std::string& received);
 
-    int tlsHandshake(tcp::Connection& tcpConnection);
-
     // RestApiRegistry& getRestApiRegister() { return apis; }
 
 private:
     std::string ipAddress_;
-    int port_;
+    std::shared_ptr<tcp::Workers> tcpWorkers_;
+    std::unique_ptr<ThreadPool> listenerThreadPool_;
     std::vector<std::unique_ptr<tcp::TcpListener>> listeners_;
-    // tcp::TcpListener tcp_;
-    // bool withSecure_;
 
     // RestApiRegistry apis;
 };

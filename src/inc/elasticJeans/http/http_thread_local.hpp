@@ -9,8 +9,8 @@
 namespace elasticJeans {
 namespace http {
 
-extern thread_local std::unique_ptr<HttpRequest> reqPtr;
-extern thread_local std::unique_ptr<HttpResponse> respPtr;
+extern thread_local std::unique_ptr<HttpRequest> request;
+extern thread_local std::unique_ptr<HttpResponse> response;
 
 } // namespace http
 } // namespace elasticJeans

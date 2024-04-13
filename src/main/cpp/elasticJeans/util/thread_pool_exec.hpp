@@ -4,6 +4,8 @@
 #include "thread_pool.hpp"
 #include "task_queue.hpp"
 
+#include <atomic>
+
 namespace elasticJeans {
 
 class ThreadPoolExecutor {
@@ -13,9 +15,11 @@ public:
     ThreadPoolExecutor &operator=(const ThreadPoolExecutor &) = delete;
     ThreadPoolExecutor &operator=(ThreadPoolExecutor &&) = delete;
 
-    ThreadPoolExecutor(size_t maxWorkers = 0x20, long long maxQueueSize = __LONG_LONG_MAX__);
+    ThreadPoolExecutor(size_t maxWorkers = 0x20, long long maxQueueSize = __LONG_LONG_MAX__, bool autoStart = true);
 
     ~ThreadPoolExecutor();
+
+    void start();
 
     void stop();
 
@@ -23,7 +27,8 @@ public:
     std::future<std::result_of_t<F(Args ...)>> submit(F&& f, Args&&... args);
 
 private:
-    bool stop_;
+    std::atomic<bool> init_ = false;
+    bool stop_ = false;
     size_t maxWorkers_;
     std::mutex mtx_;
     std::unique_ptr<ThreadPool> threadPool_;

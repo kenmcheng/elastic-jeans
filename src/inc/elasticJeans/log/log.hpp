@@ -6,6 +6,7 @@
 #include <iostream>
 #include <iomanip>
 #include <source_location>
+#include <thread>
 
 namespace elasticJeans{
 
@@ -77,8 +78,9 @@ public:
         try {
             // get current time
             char buf[1000];
-            time_t now = time(0);
-            struct tm tm = *gmtime(&now);
+            time_t now = time(nullptr);
+            struct tm tm;
+            gmtime_r(&now, &tm);
             static const char* dateFormat = "%Y-%m-%d %H:%M:%S";
             int milli = now % 1000;
             strftime(buf, sizeof buf, dateFormat, &tm);
@@ -89,6 +91,8 @@ public:
             if (severity > 0 && severity < NUM_OF_SERVERITIES) {
                 osstream << " [" << severities[severity] << "] ";
             } else osstream << " ";
+
+            osstream << std::this_thread::get_id() << " ";
 
             if (fnName.size() > 0) {
                 osstream << "[" << fnName << ":" << lineNo << "] ";
@@ -106,8 +110,10 @@ public:
             } else {
                 osstream << f;
             }
+
+            osstream << "\n";
             
-            std::cout << osstream.str() << std::endl;
+            std::cout << osstream.str();
         } catch (const std::exception& ex) {
             std::cout << ex.what() << std::endl;
         } catch (...) {
