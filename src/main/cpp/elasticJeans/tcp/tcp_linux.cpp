@@ -89,7 +89,7 @@ void TcpListener::stop() {
 
 void TcpListener::_listen_ipv4() {
     listen(socket_ipv4_fd_, socketQueueSize_);
-    Log::info("*** Listening on {}:{} ***\n", inet_ntoa(socketAddress_.sin_addr), ntohs(socketAddress_.sin_port));
+    Log::info("*** Listening on {}:{} ***", inet_ntoa(socketAddress_.sin_addr), ntohs(socketAddress_.sin_port));
     while (true) {
         int conn_socket_fd = this->_accept_ipv4();
 

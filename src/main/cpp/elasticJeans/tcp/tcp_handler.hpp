@@ -24,9 +24,9 @@ class TcpListener;
 class TcpHandler {
 public:
 
-    TcpHandler() = default;
+    TcpHandler(): TcpHandler{nullptr} {}
 
-    TcpHandler(TcpListener* tcpListener): tcpListener_{tcpListener} {}
+    TcpHandler(TcpListener* tcpListener): tcpListener_{tcpListener} { init(); }
 
     virtual void doHandle(int conn_socket_fd, const sockaddr_in& scaddr) = 0;
 
@@ -51,7 +51,7 @@ protected:
 
 class DefaultTcpHandler : public TcpHandler {
 public:
-    DefaultTcpHandler() = default;
+    DefaultTcpHandler(): DefaultTcpHandler{nullptr} {}
     DefaultTcpHandler(TcpListener* tcpListener): TcpHandler{tcpListener} {
     }
 

@@ -1,6 +1,8 @@
 #include <elasticJeans/app.hpp>
 #include <elasticJeans/app_impl.hpp>
 
+#include <elasticJeans/log/log.hpp>
+
 #include <csignal>
 #include <memory>
 #include <thread>
@@ -8,14 +10,30 @@
 namespace elasticJeans {
 
 std::unique_ptr<App> appPtr;
-std::unique_ptr<std::thread> runner;
+std::unique_ptr<std::thread> runnerPtr;
 
-void sigFunc(int signal) {
+void sigIntFunc(int signal) {
+    Log::error("Starting to shut down application...");
     appPtr.reset();
 }
 
+void sigTermFunc(int signal) {
+    Log::error("Starting to shut down application...");
+    appPtr.reset();
+}
+
+void sigSegVFunc(int signal) {
+    Log::error("Segmentation fault is signaled");
+}
+
+void handleSignal() {
+    std::signal(SIGINT, sigIntFunc);
+    std::signal(SIGTERM, sigTermFunc);
+    std::signal(SIGSEGV, sigSegVFunc);
+}
+
 App::Initiator app() {
-    std::signal(SIGINT, sigFunc);
+    handleSignal();
     return App::init();
 }
 
@@ -33,10 +51,10 @@ App::Initiator::Initiator() {
 }
 
 void App::Initiator::start() {
-    runner = std::make_unique<std::thread>([] {
+    runnerPtr = std::make_unique<std::thread>([] {
         appPtr->start();
     });
-    runner->join();
+    runnerPtr->join();
 }
 
 App::Initiator& App::Initiator::http(const std::string& ip, int port) {

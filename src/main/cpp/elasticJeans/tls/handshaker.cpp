@@ -19,9 +19,8 @@
 namespace elasticJeans {
 namespace tls {
 
-Handshaker::Handshaker() {
-    if (init() < 0) {}
-        // cleanup();
+Handshaker::Handshaker(): tcp::TcpHandler{} {
+
 }
 
 Handshaker::~Handshaker() {

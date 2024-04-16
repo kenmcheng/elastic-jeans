@@ -35,7 +35,7 @@ private:
 
 };
 
-void sigFunc(int signal);
+// void sigIntFunc(int signal);
 
 App::Initiator app();
 
