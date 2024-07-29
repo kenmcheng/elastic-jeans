@@ -1,4 +1,4 @@
-Elastic Jeans
+Lattice
 ===
 HTTP web application written in C++
 
@@ -30,13 +30,13 @@ ctest --test-dir build
 
 ## Usage
 ```
-#include <elasticJeans/jeans.hpp>
-namespace ej = elasticJeans;
+#include <lattice/jeans.hpp>
+namespace lat = lattice;
 int main() {
     std::string ip = "127.0.0.1";
     int port = 8080;
     
-    ej::app()
+    lat::app()
         .http(ip, port)
         .start();
 

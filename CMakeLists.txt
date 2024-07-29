@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(ElasticJeans)
+project(Lattice)
 
-set(EJ_LIB ej)
-set(EJ_LIB_VERSION 0.0.1)
-set(EJ_TEST ejTest)
+set(LAT_LIB lat)
+set(LAT_LIB_VERSION 0.0.1)
+set(LAT_TEST latTest)
 
 set(gTest_tag v1.14.0)
 set(openssl_tag openssl-3.2.1)
@@ -14,20 +14,20 @@ set(CMAKE_OUTPUT_DIR output)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-file(GLOB HDRS src/main/cpp/elasticJeans/**/*.hpp src/main/cpp/elasticJeans/*.hpp)
-file(GLOB SRCS src/main/cpp/elasticJeans/**/*.cpp src/main/cpp/elasticJeans/*.cpp)
+file(GLOB HDRS src/main/cpp/lattice/**/*.hpp src/main/cpp/lattice/*.hpp)
+file(GLOB SRCS src/main/cpp/lattice/**/*.cpp src/main/cpp/lattice/*.cpp)
 
-add_library(${EJ_LIB} STATIC ${HDRS} ${SRCS})
-target_include_directories(${EJ_LIB} PUBLIC src/main/cpp)
-target_include_directories(${EJ_LIB} PUBLIC src/inc)
-target_include_directories(${EJ_LIB} PUBLIC libs)
+add_library(${LAT_LIB} STATIC ${HDRS} ${SRCS})
+target_include_directories(${LAT_LIB} PUBLIC src/main/cpp)
+target_include_directories(${LAT_LIB} PUBLIC src/inc)
+target_include_directories(${LAT_LIB} PUBLIC libs)
 
 find_package(OpenSSL)
 if (OPENSSL_FOUND)
     # Add the include directories for compiling
-    target_include_directories(${EJ_LIB} PUBLIC ${OPENSSL_INCLUDE_DIR})
+    target_include_directories(${LAT_LIB} PUBLIC ${OPENSSL_INCLUDE_DIR})
     # Add the static lib for linking
-    target_link_libraries(${EJ_LIB} OpenSSL::SSL OpenSSL::Crypto)
+    target_link_libraries(${LAT_LIB} OpenSSL::SSL OpenSSL::Crypto)
     message(STATUS "Found OpenSSL ${OPENSSL_VERSION}")
 else()
     message(STATUS "Try to download OpenSSL lib from github with version ${openssl_tag}")
@@ -69,12 +69,12 @@ else()
     add_dependencies(OpenSSL::Crypto OpenSSL)
 
     # Add the include directories for compiling
-    target_include_directories(${EJ_LIB} PUBLIC ${OPENSSL_INCLUDE_DIR})
+    target_include_directories(${LAT_LIB} PUBLIC ${OPENSSL_INCLUDE_DIR})
     # Add the static lib for linking
-    target_link_libraries(${EJ_LIB} OpenSSL::SSL OpenSSL::Crypto)
+    target_link_libraries(${LAT_LIB} OpenSSL::SSL OpenSSL::Crypto)
 endif()
 
-set_target_properties(${EJ_LIB}
+set_target_properties(${LAT_LIB}
     PROPERTIES
     PREFIX                   ""
     SUFFIX                   ".lib.a"
@@ -92,18 +92,19 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-file(GLOB TEST_SRCS src/test/cpp/elasticJeans/**/*.cpp src/test/cpp/elasticJeans/*.cpp)
+file(GLOB TEST_SRCS src/test/cpp/lattice/**/*.cpp src/test/cpp/lattice/*.cpp)
+
 add_executable(
-    ${EJ_TEST}
+    ${LAT_TEST}
     ${TEST_SRCS}
 )
 
 enable_testing()
 target_link_libraries(
-    ${EJ_TEST}
+    ${LAT_TEST}
     GTest::gtest_main
-    ${EJ_LIB}
+    ${LAT_LIB}
 )
 
 include(GoogleTest)
-gtest_discover_tests(${EJ_TEST})
+gtest_discover_tests(${LAT_TEST})
